@@ -1,0 +1,63 @@
+@model List<ProiectDAW.Controllers.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container mt-4">
+    <h1>User Management</h1>
+    <p class="text-muted">Manage user roles and permissions</p>
+
+    <table class="table table-striped table-hover mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FirstName @user.LastName</td>
+                    <td>
+                        @if (user.Roles.Any())
+                        {
+                            @foreach (var role in user.Roles)
+                            {
+                                <span class="badge bg-primary me-1">@role</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">User</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.Roles.Contains("Administrator"))
+                        {
+                            <form asp-action="RemoveAdmin" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Are you sure you want to remove admin privileges from this user?')">
+                                    Remove Admin
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="AssignAdmin" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to make this user an administrator?')">
+                                    Make Admin
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
