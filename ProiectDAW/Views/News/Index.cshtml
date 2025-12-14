@@ -1,0 +1,55 @@
+@model IEnumerable<ProiectDAW.Models.NewsArticle>
+
+@{
+    ViewData["Title"] = "News Feed";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Latest News</h1>
+    @if (User.IsInRole("Editor") || User.IsInRole("Administrator"))
+    {
+        <a asp-action="Create" class="btn btn-success">+ New Article</a>
+    }
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                @if (!string.IsNullOrEmpty(item.CoverImagePath))
+                {
+                    <img src="@item.CoverImagePath" class="card-img-top" alt="Cover Image" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="text-white">No Image</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text text-muted small">
+                        By <strong>@item.Editor.FirstName @item.Editor.LastName</strong> <br />
+                        @item.CreatedDate.ToShortDateString()
+                    </p>
+                    <p class="card-text">
+                        <!-- Show snippet only (strip tags ideally, but simple truncation for now) -->
+                        @if(item.Content.Length > 100) 
+                        { 
+                             @Html.Raw(item.Content.Substring(0, 100) + "...") 
+                        }
+                        else
+                        {
+                             @Html.Raw(item.Content)
+                        }
+
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary w-100">Read More</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
