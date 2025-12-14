@@ -13,11 +13,23 @@ public static class SeedData
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         string adminRole = "Administrator";
+        string editorRole = "Editor";
+        string userRole = "User";
 
-        // Creează rolul Administrator dacă nu există
+        // Creează rolurile dacă nu există
         if (!await roleManager.RoleExistsAsync(adminRole))
         {
             await roleManager.CreateAsync(new IdentityRole(adminRole));
+        }
+
+        if (!await roleManager.RoleExistsAsync(editorRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(editorRole));
+        }
+
+        if (!await roleManager.RoleExistsAsync(userRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(userRole));
         }
 
         // Creează un utilizator admin inițial (schimbă email/parola din appsettings sau aici)

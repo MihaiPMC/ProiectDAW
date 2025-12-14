@@ -37,11 +37,12 @@
                         }
                     </td>
                     <td>
+                        @* Admin buttons *@
                         @if (user.Roles.Contains("Administrator"))
                         {
                             <form asp-action="RemoveAdmin" method="post" style="display: inline;">
                                 <input type="hidden" name="userId" value="@user.UserId" />
-                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Are you sure you want to remove admin privileges from this user?')">
+                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Remove admin privileges?')">
                                     Remove Admin
                                 </button>
                             </form>
@@ -50,8 +51,48 @@
                         {
                             <form asp-action="AssignAdmin" method="post" style="display: inline;">
                                 <input type="hidden" name="userId" value="@user.UserId" />
-                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to make this user an administrator?')">
+                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Make this user an administrator?')">
                                     Make Admin
+                                </button>
+                            </form>
+                        }
+
+                        @* Editor buttons *@
+                        @if (user.Roles.Contains("Editor"))
+                        {
+                            <form asp-action="RemoveEditor" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('Remove editor privileges?')">
+                                    Remove Editor
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="AssignEditor" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-info" onclick="return confirm('Make this user an editor?')">
+                                    Make Editor
+                                </button>
+                            </form>
+                        }
+
+                        @* User buttons *@
+                        @if (user.Roles.Contains("User"))
+                        {
+                            <form asp-action="RemoveUser" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Remove user role?')">
+                                    Remove User
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="AssignUser" method="post" style="display: inline;">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('Assign user role?')">
+                                    Make User
                                 </button>
                             </form>
                         }

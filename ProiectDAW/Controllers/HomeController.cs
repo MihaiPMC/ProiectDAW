@@ -99,6 +99,74 @@ public class AdminController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> AssignEditor(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (!await _userManager.IsInRoleAsync(user, "Editor"))
+        {
+            await _userManager.AddToRoleAsync(user, "Editor");
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RemoveEditor(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (await _userManager.IsInRoleAsync(user, "Editor"))
+        {
+            await _userManager.RemoveFromRoleAsync(user, "Editor");
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AssignUser(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (!await _userManager.IsInRoleAsync(user, "User"))
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RemoveUser(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        if (await _userManager.IsInRoleAsync(user, "User"))
+        {
+            await _userManager.RemoveFromRoleAsync(user, "User");
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }
 
 public class UserRoleViewModel
