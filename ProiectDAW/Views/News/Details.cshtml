@@ -1,0 +1,81 @@
+@model ProiectDAW.Models.NewsArticle
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">News</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <!-- Article Header -->
+    <div class="mb-4 text-center">
+        <h1 class="display-4">@Model.Title</h1>
+        <p class="text-muted">
+            Published by <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none"><strong>@Model.Editor.FirstName @Model.Editor.LastName</strong></a> on @Model.CreatedDate.ToString("f")
+        </p>
+        @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+        {
+            <img src="@Model.CoverImagePath" class="img-fluid rounded mb-3" style="max-height: 500px; width: 100%; object-fit: cover;" alt="Cover Image">
+        }
+    </div>
+
+    <!-- Article Content (Rich Text) -->
+    <div class="article-content fs-5 mb-5">
+        @Html.Raw(Model.Content)
+    </div>
+
+    <hr />
+
+    <!-- AI Trust Section (Placeholder) -->
+    @if(Model.TrustScore.HasValue)
+    {
+        <div class="alert alert-info">
+            <h5>AI Fact Check</h5>
+            <p><strong>Trust Label:</strong> @Model.TrustLabel</p>
+            <p><strong>Score:</strong> @Model.TrustScore</p>
+            <p class="mb-0">@Model.AiJustification</p>
+        </div>
+    }
+
+    <!-- Comments Section -->
+    <div class="comments-section bg-light p-4 rounded">
+        <h3>Comments (@Model.Comments.Count)</h3>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-action="AddComment" method="post" class="mb-4">
+                <input type="hidden" name="articleId" value="@Model.Id" />
+                <div class="input-group">
+                    <textarea name="content" class="form-control" placeholder="Write a comment..." rows="2" required></textarea>
+                    <button class="btn btn-primary" type="submit">Post</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p><a asp-area="Identity" asp-page="/Account/Login">Log in</a> to post a comment.</p>
+        }
+
+        <div class="list-group">
+            @foreach (var comment in Model.Comments.OrderByDescending(c => c.PostedDate))
+            {
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold">@comment.User.FirstName @comment.User.LastName</h6>
+                        <small class="text-muted">@comment.PostedDate.ToString("g")</small>
+                    </div>
+                    <p class="mb-1">@comment.Content</p>
+                </div>
+            }
+            @if (!Model.Comments.Any())
+            {
+                <p class="text-muted text-center pt-3">No comments yet. Be the first to say something!</p>
+            }
+        </div>
+    </div>
+</div>

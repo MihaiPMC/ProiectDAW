@@ -1,0 +1,57 @@
+@model ProiectDAW.Models.NewsArticle
+
+@{
+    ViewData["Title"] = "Create Article";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
+
+<h2>Create News Article</h2>
+
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CoverImagePath" class="form-label">Cover Image</label>
+        <input type="file" name="coverImage" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label"></label>
+        <!-- Summernote will attach here -->
+        <textarea asp-for="Content" id="summernote"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Publish</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $('#summernote').summernote({
+            placeholder: 'Write your article here...',
+            tabsize: 2,
+            height: 400,
+            toolbar: [
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              ['color', ['color']],
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video']],
+              ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
