@@ -16,32 +16,36 @@
     @foreach (var item in Model)
     {
         <div class="col">
-            <div class="card h-100 shadow-sm">
-                @if (!string.IsNullOrEmpty(item.CoverImagePath))
-                {
-                    <img src="@item.CoverImagePath" class="card-img-top" alt="Cover Image" style="height: 200px; object-fit: cover;">
-                }
-                else
-                {
-                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <span class="text-white">No Image</span>
-                    </div>
-                }
+            <div class="card h-100 shadow-sm card-hover">
+                <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                    @if (!string.IsNullOrEmpty(item.CoverImagePath))
+                    {
+                        <img src="@item.CoverImagePath" class="card-img-top" alt="Cover Image" style="height: 200px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span class="text-white">No Image</span>
+                        </div>
+                    }
+                </a>
                 <div class="card-body">
-                    <h5 class="card-title">@item.Title</h5>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                        <h5 class="card-title fw-bold">@item.Title</h5>
+                    </a>
                     <p class="card-text text-muted small">
-                        By <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@item.EditorId" class="text-decoration-none"><strong>@item.Editor.FirstName @item.Editor.LastName</strong></a> <br />
+                        By <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@item.EditorId" class="text-decoration-none text-primary"><strong>@item.Editor.FirstName @item.Editor.LastName</strong></a> <br />
                         @item.CreatedDate.ToShortDateString()
                     </p>
                     <p class="card-text">
                         <!-- Show snippet only (strip tags ideally, but simple truncation for now) -->
                         @if(item.Content.Length > 100) 
                         { 
-                             @Html.Raw(item.Content.Substring(0, 100) + "...") 
+                            @Html.Raw(item.Content.Substring(0, 100) + "...") 
                         }
                         else
                         {
-                             @Html.Raw(item.Content)
+                            @Html.Raw(item.Content)
                         }
 
                     </p>

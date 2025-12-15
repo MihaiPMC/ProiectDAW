@@ -1,0 +1,64 @@
+@model List<ProiectDAW.Controllers.EditorProfileViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @foreach (var editor in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            @if (!string.IsNullOrEmpty(editor.ProfilePicturePath))
+                            {
+                                <img src="@editor.ProfilePicturePath" 
+                                     alt="@editor.FirstName @editor.LastName" 
+                                     class="rounded-circle me-3"
+                                     style="width: 60px; height: 60px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-secondary text-white me-3 d-flex align-items-center justify-content-center"
+                                     style="width: 60px; height: 60px;">
+                                    <span class="h4 mb-0">@editor.FirstName[0]@editor.LastName[0]</span>
+                                </div>
+                            }
+                            <div>
+                                <h5 class="card-title mb-0">@editor.FirstName @editor.LastName</h5>
+                                @if (editor.IsProfilePrivate)
+                                {
+                                    <small class="text-muted">
+                                        <i class="bi bi-lock"></i> Private Profile
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-success">
+                                        <i class="bi bi-globe"></i> Public Profile
+                                    </small>
+                                }
+                            </div>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(editor.Description))
+                        {
+                            <p class="card-text text-muted small">
+                                @(editor.Description.Length > 100 ? editor.Description.Substring(0, 100) + "..." : editor.Description)
+                            </p>
+                        }
+                        
+                        <a asp-action="ViewProfile" asp-route-id="@editor.UserId" class="btn btn-outline-primary btn-sm w-100 mt-2">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center shadow-sm border-0">
+        <i class="bi bi-info-circle me-2"></i> No editors found matching your criteria.
+    </div>
+}

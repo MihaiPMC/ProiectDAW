@@ -1,101 +1,83 @@
-@model ProiectDAW.Controllers.EditorSearchViewModel
-@{
-    ViewData["Title"] = "Căutare Editori";
-}
-
-<div class="container mt-4">
-    <h2>Căutare Editori</h2>
-    <p class="text-muted">Caută editori după nume pentru a vizualiza profilurile lor</p>
-
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <form asp-action="Search" method="get" class="d-flex">
-                <input type="text" 
-                       name="searchTerm" 
-                       class="form-control me-2" 
-                       placeholder="Caută după nume (ex: Ion Popescu, Ion, Popescu...)" 
-                       value="@Model.SearchTerm" />
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Caută
-                </button>
-            </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Find Editors</h2>
+            <p class="text-muted lead">Discover the voices behind our stories.</p>
         </div>
     </div>
 
-    @if (!string.IsNullOrEmpty(Model.SearchTerm))
-    {
-        <div class="mt-4">
-            <h4>Rezultate căutare: <span class="text-muted">@Model.Editors.Count editor(i) găsit(i)</span></h4>
-            
-            @if (Model.Editors.Any())
-            {
-                <div class="row">
-                    @foreach (var editor in Model.Editors)
-                    {
-                        <div class="col-md-6 col-lg-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        @if (!string.IsNullOrEmpty(editor.ProfilePicturePath))
-                                        {
-                                            <img src="@editor.ProfilePicturePath" 
-                                                 alt="@editor.FirstName @editor.LastName" 
-                                                 class="rounded-circle me-3"
-                                                 style="width: 60px; height: 60px; object-fit: cover;" />
-                                        }
-                                        else
-                                        {
-                                            <div class="rounded-circle bg-secondary text-white me-3 d-flex align-items-center justify-content-center"
-                                                 style="width: 60px; height: 60px;">
-                                                <span class="h4 mb-0">@editor.FirstName[0]@editor.LastName[0]</span>
-                                            </div>
-                                        }
-                                        <div>
-                                            <h5 class="card-title mb-0">@editor.FirstName @editor.LastName</h5>
-                                            @if (editor.IsProfilePrivate)
-                                            {
-                                                <small class="text-muted">
-                                                    <i class="bi bi-lock"></i> Profil privat
-                                                </small>
-                                            }
-                                            else
-                                            {
-                                                <small class="text-muted">
-                                                    <i class="bi bi-globe"></i> Profil public
-                                                </small>
-                                            }
-                                        </div>
-                                    </div>
-                                    
-                                    @if (!string.IsNullOrEmpty(editor.Description))
-                                    {
-                                        <p class="card-text text-muted small">
-                                            @(editor.Description.Length > 100 ? editor.Description.Substring(0, 100) + "..." : editor.Description)
-                                        </p>
-                                    }
-                                    
-                                    <a asp-action="ViewProfile" asp-route-id="@editor.UserId" class="btn btn-primary btn-sm w-100">
-                                        Vezi Profil
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> Nu au fost găsiți editori pentru căutarea "<strong>@Model.SearchTerm</strong>".
-                </div>
-            }
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="input-group input-group-lg shadow-sm">
+                <span class="input-group-text bg-white border-0 ps-4">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" 
+                       id="searchInput"
+                       class="form-control border-0 py-3" 
+                       placeholder="Type a name to search..." 
+                       aria-label="Search editors"
+                       autocomplete="off">
+            </div>
+            <div class="text-end mt-2">
+                <small class="text-muted" id="statusText">Start typing to search...</small>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="alert alert-secondary">
-            <i class="bi bi-lightbulb"></i> Introdu un termen de căutare pentru a găsi editori.
+    </div>
+
+    <div id="resultsContainer" class="fade-in">
+        <!-- Results will be loaded here via AJAX -->
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-person-search display-1 opacity-25"></i>
+            <p class="mt-3">Results will appear here</p>
         </div>
-    }
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const statusText = document.getElementById('statusText');
+            let debounceTimer;
+
+            searchInput.addEventListener('input', function (e) {
+                const term = e.target.value;
+                statusText.innerText = 'Typing...';
+
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    fetchResults(term);
+                }, 300); // 300ms debounce
+            });
+
+            function fetchResults(term) {
+                if (!term || term.trim() === '') {
+                    resultsContainer.innerHTML = `
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-person-search display-1 opacity-25"></i>
+                            <p class="mt-3">Results will appear here</p>
+                        </div>`;
+                    statusText.innerText = 'Waiting for input...';
+                    return;
+                }
+
+                statusText.innerText = 'Searching...';
+                
+                // Use fetch API
+                fetch(`@Url.Action("SearchEditors", "Profile")?searchTerm=${encodeURIComponent(term)}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        resultsContainer.innerHTML = html;
+                        statusText.innerText = 'Updated.';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        statusText.innerText = 'Search error.';
+                    });
+            }
+        });
+    </script>
+}
 

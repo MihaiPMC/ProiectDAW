@@ -35,25 +35,25 @@
                     @if (Model.IsProfilePrivate)
                     {
                         <p class="text-muted">
-                            <i class="bi bi-lock"></i> Profil privat
+                            <i class="bi bi-lock"></i> Private Profile
                         </p>
                     }
                     else
                     {
                         <p class="text-muted">
-                            <i class="bi bi-globe"></i> Profil public
+                            <i class="bi bi-globe"></i> Public Profile
                         </p>
                     }
                     
                     @if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == Model.UserId)
                     {
                         <a asp-action="Edit" class="btn btn-primary w-100 mb-2">
-                            <i class="bi bi-pencil"></i> Editează Profil
+                            <i class="bi bi-pencil"></i> Edit Profile
                         </a>
                     }
                     
                     <p class="text-muted small">
-                        <i class="bi bi-calendar"></i> Membru din @Model.CreatedAt.ToString("MMMM yyyy")
+                        <i class="bi bi-calendar"></i> Member since @Model.CreatedAt.ToString("MMMM yyyy")
                     </p>
                 </div>
             </div>
@@ -62,7 +62,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Despre</h4>
+                    <h4 class="card-title">About</h4>
                     
                     @if (!string.IsNullOrEmpty(Model.Description))
                     {
@@ -70,13 +70,13 @@
                     }
                     else
                     {
-                        <p class="card-text text-muted">Nicio descriere adăugată.</p>
+                        <p class="card-text text-muted">No description added.</p>
                     }
                     
                     @if (Model.IsLimitedView)
                     {
                         <div class="alert alert-info mt-3">
-                            <i class="bi bi-lock"></i> Acest profil este privat. Poți vedea doar informațiile de bază.
+                            <i class="bi bi-lock"></i> This profile is private. You can only see basic information.
                         </div>
                     }
                     else
@@ -88,7 +88,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h2 class="mb-0">@Model.ArticlesCount</h2>
-                                        <p class="text-muted mb-0">Articole publicate</p>
+                                        <p class="text-muted mb-0">Published Articles</p>
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h2 class="mb-0">@Model.FollowersCount</h2>
-                                        <p class="text-muted mb-0">Urmăritori</p>
+                                        <p class="text-muted mb-0">Followers</p>
                                     </div>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                         
                         @if (Model.Articles != null && Model.Articles.Any())
                         {
-                            <h4 class="mt-4">Articole Recente</h4>
+                            <h4 class="mt-4">Recent Articles</h4>
                             <div class="list-group mt-3">
                                 @foreach (var article in Model.Articles)
                                 {
@@ -124,7 +124,7 @@
                                                 @article.Content
                                             }
                                         </p>
-                                        <small class="text-primary">Citește mai mult <i class="bi bi-arrow-right"></i></small>
+                                        <small class="text-primary">Read More <i class="bi bi-arrow-right"></i></small>
                                     </a>
                                 }
                             </div>
@@ -132,7 +132,7 @@
                         else if (Model.IsEditor)
                         {
                             <div class="alert alert-light mt-3 text-center">
-                                <p class="mb-0">Acest editor nu a publicat încă niciun articol.</p>
+                                <p class="mb-0">This editor has not published any articles yet.</p>
                             </div>
                         }
                     }
@@ -151,7 +151,7 @@
 
     <div class="mt-3">
         <a asp-action="Search" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Înapoi la căutare
+            <i class="bi bi-arrow-left"></i> Back to Search
         </a>
     </div>
 </div>

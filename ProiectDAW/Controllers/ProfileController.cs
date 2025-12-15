@@ -33,38 +33,55 @@ namespace ProiectDAW.Controllers
                 SearchTerm = searchTerm
             };
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            // Initial load empty or with search term if provided
+            return View(model);
+        }
+
+        // GET: Profile/SearchEditors (AJAX)
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchEditors(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                // Caută editori după nume (FirstName sau LastName)
-                var editors = await _userManager.Users
-                    .Where(u => 
-                        (u.FirstName.Contains(searchTerm) || u.LastName.Contains(searchTerm)) ||
-                        (u.FirstName + " " + u.LastName).Contains(searchTerm))
-                    .ToListAsync();
-
-                // Filtrează doar utilizatorii care au rolul de Editor sau Administrator
-                var editorUsers = new List<ApplicationUser>();
-                foreach (var user in editors)
-                {
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (roles.Contains("Editor") || roles.Contains("Administrator"))
-                    {
-                        editorUsers.Add(user);
-                    }
-                }
-
-                model.Editors = editorUsers.Select(e => new EditorProfileViewModel
-                {
-                    UserId = e.Id,
-                    FirstName = e.FirstName,
-                    LastName = e.LastName,
-                    Description = e.Description,
-                    ProfilePicturePath = e.ProfilePicturePath,
-                    IsProfilePrivate = e.IsProfilePrivate
-                }).ToList();
+                return PartialView("_EditorListPartial", new List<EditorProfileViewModel>());
             }
 
-            return View(model);
+            // Case-insensitive search using ToLower() for safety, though SQL might handle it.
+            // Using logic: if names parts contain the search term.
+            searchTerm = searchTerm.ToLower();
+            
+            var editors = await _userManager.Users
+                .ToListAsync(); // Pull users first to filter client-side for roles if needed, or query efficiently.
+                                // NOTE: complex queries with roles are tricky in LINQ to Entities directly if roles are separate tables.
+                                // Optimisation: Filter in memory for small datasets, or Join for large.
+                                
+            var filteredEditors = new List<EditorProfileViewModel>();
+            
+            foreach (var user in editors)
+            {
+                // Check name match first
+                string fullName = (user.FirstName + " " + user.LastName).ToLower();
+                if (user.FirstName.ToLower().Contains(searchTerm) || 
+                    user.LastName.ToLower().Contains(searchTerm) || 
+                    fullName.Contains(searchTerm))
+                {
+                    // Then Check Role
+                    if (await _userManager.IsInRoleAsync(user, "Editor") || await _userManager.IsInRoleAsync(user, "Administrator"))
+                    {
+                        filteredEditors.Add(new EditorProfileViewModel
+                        {
+                            UserId = user.Id,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Description = user.Description,
+                            ProfilePicturePath = user.ProfilePicturePath,
+                            IsProfilePrivate = user.IsProfilePrivate
+                        });
+                    }
+                }
+            }
+
+            return PartialView("_EditorListPartial", filteredEditors); 
         }
 
         // GET: Profile/ViewProfile/{id}
