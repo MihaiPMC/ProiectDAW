@@ -1,0 +1,31 @@
+@model ProiectDAW.Models.Comment
+
+@{
+    ViewData["Title"] = "Edit Comment";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Edit Comment</h3>
+                    
+                    <form asp-action="EditComment" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Your Comment</label>
+                            <textarea name="content" class="form-control" rows="4" required>@Model.Content</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Details" asp-route-id="@Model.NewsArticleId" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

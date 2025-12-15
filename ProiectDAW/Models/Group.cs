@@ -57,6 +57,7 @@ namespace ProiectDAW.Models
         public string Content { get; set; }
 
         public DateTime Timestamp { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; }
 
         // Foreign keys
         public int GroupId { get; set; }

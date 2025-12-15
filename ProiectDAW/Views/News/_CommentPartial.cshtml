@@ -1,0 +1,118 @@
+@model ProiectDAW.Models.Comment
+@using ProiectDAW.Models
+
+@* Recursive logic is handled here *@
+
+<div class="list-group-item bg-transparent border-bottom py-3 ps-3" style="@(Model.ParentCommentId != null ? "border-left: 2px solid #e2e8f0; margin-left: 20px;" : "")">
+    <div class="d-flex w-100 justify-content-between align-items-start">
+        <div>
+            @if (Model.IsDeleted)
+            {
+                <h6 class="mb-1 fw-bold text-muted fst-italic">[deleted]</h6>
+                <small class="text-muted">
+                    @Model.PostedDate.ToString("g")
+                </small>
+            }
+            else
+            {
+                <h6 class="mb-1 fw-bold text-primary">@Model.User.FirstName @Model.User.LastName</h6>
+                <small class="text-muted">
+                    @Model.PostedDate.ToString("g")
+                    @if(Model.IsEdited)
+                    {
+                        <span class="fst-italic ms-1">(edited)</span>
+                    }
+                </small>
+            }
+        </div>
+        
+        @if (User.Identity.IsAuthenticated && !Model.IsDeleted)
+        {
+            <div class="d-flex align-items-center">
+                <button class="btn btn-sm btn-link text-decoration-none me-2" onclick="toggleReplyForm(@Model.Id)">
+                    <i class="bi bi-reply-fill"></i> Reply
+                </button>
+
+                @{
+                    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    // Permissions: Admin OR Comment Owner OR Article Editor
+                    bool canModerate = User.IsInRole("Administrator") 
+                                       || currentUserId == Model.UserId
+                                       || (Model.NewsArticle != null && currentUserId == Model.NewsArticle.EditorId)
+                                       || (ViewData["EditorId"] as string == currentUserId); 
+                }
+
+                @if (canModerate)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                            @if(currentUserId == Model.UserId || User.IsInRole("Administrator"))
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button" onclick="toggleEditComment(@Model.Id)">
+                                        <i class="bi bi-pencil text-primary me-2"></i> Edit
+                                    </button>
+                                </li>
+                            }
+                            <li>
+                                <form asp-controller="News" asp-action="DeleteComment" asp-route-id="@Model.Id" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this comment?');">
+                                        <i class="bi bi-trash text-danger me-2"></i> Delete
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    @if (Model.IsDeleted)
+    {
+        <p class="mb-1 mt-2 text-muted fst-italic">This comment was deleted.</p>
+    }
+    else
+    {
+        <div id="comment-text-@Model.Id">
+            <p class="mb-1 mt-2">@Model.Content</p>
+        </div>
+
+        <div id="edit-form-@Model.Id" class="mt-2 d-none">
+            <form asp-controller="News" asp-action="EditComment" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="mb-2">
+                    <textarea name="content" class="form-control" rows="3" required>@Model.Content</textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditComment(@Model.Id)">Cancel</button>
+                </div>
+            </form>
+        </div>
+    }
+
+    <!-- Reply Form -->
+    <div id="reply-form-@Model.Id" class="mt-3 d-none">
+        <form asp-controller="News" asp-action="AddComment" method="post">
+            <input type="hidden" name="articleId" value="@Model.NewsArticleId" />
+            <input type="hidden" name="parentCommentId" value="@Model.Id" />
+            <div class="input-group input-group-sm">
+                <textarea name="content" class="form-control" placeholder="Write a reply..." rows="2" required></textarea>
+                <button class="btn btn-primary" type="submit">Reply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Render Replies -->
+@if (Model.Replies != null && Model.Replies.Any())
+{
+    foreach (var reply in Model.Replies.OrderBy(r => r.PostedDate))
+    {
+        // Pass the same ViewData to nested partials
+        @await Html.PartialAsync("_CommentPartial", reply, ViewData) 
+    }
+}

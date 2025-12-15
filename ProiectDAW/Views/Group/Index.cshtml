@@ -1,0 +1,94 @@
+@model ProiectDAW.Controllers.GroupIndexViewModel
+@{
+    ViewData["Title"] = "Grupuri";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people-fill"></i> Grupuri</h2>
+        @if (User.IsInRole("Editor") || User.IsInRole("Administrator"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Creează Grup
+            </a>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Groups.Any())
+    {
+        <div class="row">
+            @foreach (var group in Model.Groups)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                @group.Name
+                                @if (group.IsOwner)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-shield-fill"></i> Moderator
+                                    </span>
+                                }
+                                @if (group.IsMember)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Membru
+                                    </span>
+                                }
+                                @if (group.HasPendingRequest)
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-clock"></i> În așteptare
+                                    </span>
+                                }
+                            </h5>
+                            
+                            <p class="card-text text-muted">
+                                @(group.Description.Length > 100 ? group.Description.Substring(0, 100) + "..." : group.Description)
+                            </p>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-person"></i> Moderator: <strong>@group.OwnerName</strong>
+                                </small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-people"></i> @group.MembersCount membri
+                                </small>
+                            </div>
+                            
+                            <a asp-action="Details" asp-route-id="@group.Id" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-eye"></i> Vezi Detalii
+                            </a>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small>Creat: @group.CreatedDate.ToString("dd MMM yyyy")</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Nu există grupuri create încă.
+            @if (User.IsInRole("Editor") || User.IsInRole("Administrator"))
+            {
+                <text>Creează primul grup!</text>
+            }
+        </div>
+    }
+</div>
+

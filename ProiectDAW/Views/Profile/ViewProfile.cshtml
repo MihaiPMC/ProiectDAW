@@ -1,4 +1,15 @@
 @model ProiectDAW.Controllers.ViewProfileViewModel
+@using System.Text.RegularExpressions
+
+@functions {
+    public string StripHtml(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
+        // Decode HTML entities (e.g., &nbsp;) and then strip tags
+        var noHtml = Regex.Replace(input, "<.*?>", string.Empty);
+        return System.Web.HttpUtility.HtmlDecode(noHtml).Trim();
+    }
+}
 @{
     ViewData["Title"] = $"{Model.FirstName} {Model.LastName}";
 }
@@ -113,15 +124,17 @@
                                             <h5 class="mb-1">@article.Title</h5>
                                             <small class="text-muted">@article.CreatedDate.ToString("dd MMM yyyy")</small>
                                         </div>
-                                        <p class="mb-1">
-                                            @if(!string.IsNullOrEmpty(article.Content) && article.Content.Length > 150)
-                                            {
-                                                @article.Content.Substring(0, 150)
-                                                <text>...</text>
-                                            }
-                                            else
-                                            {
-                                                @article.Content
+                                        <p class="mb-1 text-muted">
+                                            @{
+                                                var plainText = StripHtml(article.Content);
+                                                if (plainText.Length > 150)
+                                                {
+                                                    @plainText.Substring(0, 150)<text>...</text>
+                                                }
+                                                else
+                                                {
+                                                    @plainText
+                                                }
                                             }
                                         </p>
                                         <small class="text-primary">Read More <i class="bi bi-arrow-right"></i></small>

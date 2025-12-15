@@ -1,0 +1,249 @@
+@model ProiectDAW.Controllers.GroupDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="bi bi-people-fill"></i> @Model.Name
+                        @if (Model.IsOwner)
+                        {
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-shield-fill"></i> Moderator
+                            </span>
+                        }
+                    </h2>
+                    <p class="card-text">@Model.Description</p>
+                    
+                    <hr />
+                    
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> Moderator: <strong>@Model.OwnerName</strong>
+                        </small>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> Creat: @Model.CreatedDate.ToString("dd MMMM yyyy")
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-people"></i> @Model.Members.Count membri
+                        </small>
+                    </div>
+
+                    @if (Model.IsOwner)
+                    {
+                        <div class="d-flex gap-2">
+                            <a asp-action="ManageMembers" asp-route-id="@Model.Id" class="btn btn-primary">
+                                <i class="bi bi-people"></i> Gestionează Membri
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" 
+                                  onsubmit="return confirm('Ești sigur că vrei să ștergi acest grup? Toate mesajele și membrii vor fi pierduți.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Șterge Grup
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (Model.IsMember)
+                    {
+                        <form asp-action="Leave" asp-route-id="@Model.Id" method="post" 
+                              onsubmit="return confirm('Ești sigur că vrei să părăsești acest grup?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-box-arrow-right"></i> Părăsește Grupul
+                            </button>
+                        </form>
+                    }
+                    else if (Model.HasPendingRequest)
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-clock"></i> Cererea ta de alăturare așteaptă aprobarea moderatorului.
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="Join" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Alătură-te Grupului
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            @* Mesaje *@
+            @if (Model.IsMember || Model.IsOwner)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Mesaje</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                        @if (Model.Messages.Any())
+                        {
+                            @foreach (var message in Model.Messages)
+                            {
+                                <div class="card mb-2 @(message.IsOwnMessage ? "border-primary" : "")">
+                                    <div class="card-body py-2">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <strong>@message.SenderName</strong>
+                                                <small class="text-muted">
+                                                    @message.Timestamp.ToString("dd/MM/yyyy HH:mm")
+                                                    @if (message.UpdatedAt != null)
+                                                    {
+                                                        <span class="badge bg-secondary">editat</span>
+                                                    }
+                                                </small>
+                                                <p class="mb-0 mt-1">@message.Content</p>
+                                            </div>
+                                            @if (message.IsOwnMessage)
+                                            {
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-primary" 
+                                                            onclick="editMessage(@message.Id, '@Html.Raw(message.Content.Replace("'", "\\'"))')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <form asp-action="DeleteMessage" method="post" style="display: inline;" 
+                                                          onsubmit="return confirm('Ești sigur că vrei să ștergi acest mesaj?');">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="messageId" value="@message.Id" />
+                                                        <button type="submit" class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Niciun mesaj încă. Fii primul care trimite un mesaj!</p>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="SendMessage" method="post" id="messageForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="groupId" value="@Model.Id" />
+                            <div class="input-group">
+                                <input type="text" name="content" id="messageInput" class="form-control" 
+                                       placeholder="Scrie un mesaj..." required />
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Trimite
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <i class="bi bi-lock"></i> Trebuie să fii membru al grupului pentru a vedea și trimite mesaje.
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Membri (@Model.Members.Count)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Members.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var member in Model.Members)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <i class="bi bi-person-circle"></i> @member.UserName
+                                        @if (member.UserId == Model.OwnerId)
+                                        {
+                                            <span class="badge bg-warning text-dark">Moderator</span>
+                                        }
+                                    </div>
+                                    <small class="text-muted">@member.JoinedDate.ToString("dd MMM")</small>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">Niciun membru încă.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Înapoi la Grupuri
+        </a>
+    </div>
+</div>
+
+<!-- Modal pentru editare mesaj -->
+<div class="modal fade" id="editMessageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="EditMessage" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Editează Mesaj</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="messageId" id="editMessageId" />
+                    <div class="mb-3">
+                        <label for="editMessageContent" class="form-label">Mesaj</label>
+                        <textarea name="content" id="editMessageContent" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function editMessage(id, content) {
+            document.getElementById('editMessageId').value = id;
+            document.getElementById('editMessageContent').value = content;
+            new bootstrap.Modal(document.getElementById('editMessageModal')).show();
+        }
+    </script>
+}
+
