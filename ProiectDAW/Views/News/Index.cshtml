@@ -30,7 +30,7 @@
                 <div class="card-body">
                     <h5 class="card-title">@item.Title</h5>
                     <p class="card-text text-muted small">
-                        By <strong>@item.Editor.FirstName @item.Editor.LastName</strong> <br />
+                        By <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@item.EditorId" class="text-decoration-none"><strong>@item.Editor.FirstName @item.Editor.LastName</strong></a> <br />
                         @item.CreatedDate.ToShortDateString()
                     </p>
                     <p class="card-text">

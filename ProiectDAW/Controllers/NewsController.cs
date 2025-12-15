@@ -24,7 +24,11 @@ namespace ProiectDAW.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var news = await _context.NewsArticles.Include(n => n.Editor).OrderByDescending(n => n.CreatedDate).ToListAsync();
+            var news = await _context.NewsArticles
+                .Include(n => n.Editor)
+                .Where(n => !n.Editor.IsProfilePrivate)
+                .OrderByDescending(n => n.CreatedDate)
+                .ToListAsync();
             return View(news);
         }
 

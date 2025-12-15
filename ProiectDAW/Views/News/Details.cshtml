@@ -16,7 +16,7 @@
     <div class="mb-4 text-center">
         <h1 class="display-4">@Model.Title</h1>
         <p class="text-muted">
-            Published by <strong>@Model.Editor.FirstName @Model.Editor.LastName</strong> on @Model.CreatedDate.ToString("f")
+            Published by <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none"><strong>@Model.Editor.FirstName @Model.Editor.LastName</strong></a> on @Model.CreatedDate.ToString("f")
         </p>
         @if (!string.IsNullOrEmpty(Model.CoverImagePath))
         {

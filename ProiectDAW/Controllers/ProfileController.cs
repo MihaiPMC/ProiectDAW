@@ -113,6 +113,11 @@ namespace ProiectDAW.Controllers
                     .Where(a => a.EditorId == user.Id)
                     .CountAsync();
                 
+                model.Articles = await _context.NewsArticles
+                    .Where(a => a.EditorId == user.Id)
+                    .OrderByDescending(a => a.CreatedDate)
+                    .ToListAsync();
+                
                 model.FollowersCount = await _context.Follows
                     .Where(f => f.EditorId == user.Id)
                     .CountAsync();
@@ -263,6 +268,7 @@ namespace ProiectDAW.Controllers
         // Informații suplimentare pentru profilul public
         public int ArticlesCount { get; set; }
         public int FollowersCount { get; set; }
+        public List<NewsArticle> Articles { get; set; } = new List<NewsArticle>();
     }
 
     public class EditProfileViewModel
