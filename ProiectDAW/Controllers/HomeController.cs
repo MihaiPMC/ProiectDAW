@@ -3,21 +3,47 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProiectDAW.Models;
+using ProiectDAW.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProiectDAW.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _logger = logger;
+        _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Index()
     {
         return View();
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Following()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return NotFound();
+
+        var followedIds = await _context.Follows
+            .Where(f => f.FollowerId == user.Id && f.Status == FollowStatus.Approved)
+            .Select(f => f.EditorId)
+            .ToListAsync();
+
+        var friendsArticles = await _context.NewsArticles
+            .Include(n => n.Editor)
+            .Where(n => followedIds.Contains(n.EditorId))
+            .OrderByDescending(n => n.CreatedDate)
+            .ToListAsync();
+
+        return View(friendsArticles);
     }
 
 

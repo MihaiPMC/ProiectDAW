@@ -1,0 +1,30 @@
+@model List<ProiectDAW.Models.NewsArticle>
+
+@{
+    ViewData["Title"] = "Following";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Following</h1>
+        <p class="lead text-muted">Updates from the editors you follow.</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var article in Model)
+            {
+                @await Html.PartialAsync("_ArticleCard", article)
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-people display-4 mb-3"></i>
+            <p>You aren't following anyone yet, or they haven't posted anything.</p>
+            <a asp-controller="Profile" asp-action="Search" class="btn btn-outline-primary mt-2">Find Editors</a>
+        </div>
+    }
+</div>

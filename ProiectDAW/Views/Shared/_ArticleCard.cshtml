@@ -1,0 +1,42 @@
+@model ProiectDAW.Models.NewsArticle
+
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none text-dark d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(Model.Editor.ProfilePicturePath))
+                    {
+                        <img src="@Model.Editor.ProfilePicturePath" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            @(Model.Editor.FirstName?[0])@(Model.Editor.LastName?[0])
+                        </div>
+                    }
+                    <div>
+                        <h6 class="mb-0">@Model.Editor.FirstName @Model.Editor.LastName</h6>
+                        <small class="text-muted">@Model.CreatedDate.ToString("dd MMM yyyy")</small>
+                    </div>
+                </a>
+            </div>
+            
+            <h5 class="card-title">
+                <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none text-dark">
+                    @Model.Title
+                </a>
+            </h5>
+            <p class="card-text text-muted">
+                @if (Model.Content != null) 
+                {
+                    var plainText = System.Text.RegularExpressions.Regex.Replace(Model.Content, "<.*?>", string.Empty);
+                    @(plainText.Length > 100 ? plainText.Substring(0, 100) + "..." : plainText)
+                }
+            </p>
+        </div>
+        <div class="card-footer bg-white border-top-0">
+            <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Read More</a>
+        </div>
+    </div>
+</div>

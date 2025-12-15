@@ -103,6 +103,31 @@ namespace ProiectDAW.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var isEditor = roles.Contains("Editor") || roles.Contains("Administrator");
 
+            // Check Follow Status if user is logged in
+            FollowStatus? followStatus = null;
+            bool isFollowing = false;
+            
+            if (User.Identity.IsAuthenticated)
+            {
+                var currentUserId = _userManager.GetUserId(User);
+                if (currentUserId != user.Id)
+                {
+                    var follow = await _context.Follows
+                        .FirstOrDefaultAsync(f => f.FollowerId == currentUserId && f.EditorId == user.Id);
+                        
+                    if (follow != null)
+                    {
+                        followStatus = follow.Status;
+                        isFollowing = follow.Status == FollowStatus.Approved;
+                    }
+                }
+                else
+                {
+                    // Viewing own profile, treat as "following" for visibility purposes or handle separately
+                    isFollowing = true; 
+                }
+            }
+
             var model = new ViewProfileViewModel
             {
                 UserId = user.Id,
@@ -112,20 +137,29 @@ namespace ProiectDAW.Controllers
                 ProfilePicturePath = user.ProfilePicturePath,
                 IsProfilePrivate = user.IsProfilePrivate,
                 IsEditor = isEditor,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt,
+                CurrentUserFollowStatus = followStatus,
+                IsFollowing = isFollowing
             };
 
-            // Dacă profilul este privat, returnează doar informațiile de bază
-            if (user.IsProfilePrivate)
+            // Logic for what to show
+            // Show full profile if:
+            // 1. Profile is Public
+            // 2. OR Profile is Private BUT (User is Following (Approved) OR User is Self)
+            bool showFullProfile = !user.IsProfilePrivate || (user.IsProfilePrivate && isFollowing);
+            
+            // Note: isFollowing is true if it's my own profile (set above: currentUserId == user.Id)
+            
+            if (!showFullProfile)
             {
                 model.IsLimitedView = true;
             }
             else
             {
-                // Profilul este public - afișează toate informațiile
+                // Profilul este public SAU suntem prieteni/eu insumi - afișează toate informațiile
                 model.IsLimitedView = false;
                 
-                // Adaugă statistici suplimentare pentru profilul public
+                // Adaugă statistici suplimentare
                 model.ArticlesCount = await _context.NewsArticles
                     .Where(a => a.EditorId == user.Id)
                     .CountAsync();
@@ -136,7 +170,7 @@ namespace ProiectDAW.Controllers
                     .ToListAsync();
                 
                 model.FollowersCount = await _context.Follows
-                    .Where(f => f.EditorId == user.Id)
+                    .Where(f => f.EditorId == user.Id && f.Status == FollowStatus.Approved)
                     .CountAsync();
             }
 
@@ -286,6 +320,10 @@ namespace ProiectDAW.Controllers
         public int ArticlesCount { get; set; }
         public int FollowersCount { get; set; }
         public List<NewsArticle> Articles { get; set; } = new List<NewsArticle>();
+        
+        // Follow Status relative to current logged in user
+        public FollowStatus? CurrentUserFollowStatus { get; set; }
+        public bool IsFollowing { get; set; }
     }
 
     public class EditProfileViewModel
