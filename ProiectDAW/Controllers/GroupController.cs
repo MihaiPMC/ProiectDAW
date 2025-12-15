@@ -81,6 +81,16 @@ namespace ProiectDAW.Controllers
             _context.Groups.Add(group);
             await _context.SaveChangesAsync();
 
+            var member = new GroupMember
+            {
+                GroupId = group.Id,
+                UserId = currentUser.Id,
+                IsAccepted = true,
+                JoinedDate = DateTime.Now
+            };
+            _context.GroupMembers.Add(member);
+            await _context.SaveChangesAsync();
+
             TempData["SuccessMessage"] = "Grupul a fost creat cu succes!";
             return RedirectToAction(nameof(Details), new { id = group.Id });
         }
