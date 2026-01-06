@@ -12,12 +12,14 @@ namespace ProiectDAW.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
+        private readonly Services.IAiFactCheckService _aiService;
 
-        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
+        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment env, Services.IAiFactCheckService aiService)
         {
             _context = context;
             _userManager = userManager;
             _env = env;
+            _aiService = aiService;
         }
 
         // GET: News
@@ -121,6 +123,12 @@ namespace ProiectDAW.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 article.EditorId = user.Id;
                 article.CreatedDate = DateTime.Now;
+
+                // AI Fact Check
+                var (trustScore, trustLabel, justification) = await _aiService.GetContentTrustScoreAsync(article.Title, article.Content);
+                article.TrustScore = trustScore;
+                article.TrustLabel = trustLabel;
+                article.AiJustification = justification;
 
                 // Handle Image Upload
                 if (coverImage != null && coverImage.Length > 0)

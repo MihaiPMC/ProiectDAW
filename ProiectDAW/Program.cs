@@ -11,6 +11,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Load .env file
+DotNetEnv.Env.Load();
+builder.Services.AddScoped<ProiectDAW.Services.IAiFactCheckService, ProiectDAW.Services.AiFactCheckService>();
+
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
