@@ -52,6 +52,14 @@
                                                     <i class="bi bi-x-circle"></i> Respinge
                                                 </button>
                                             </form>
+                                            <form asp-action="BlockMember" method="post" style="display: inline;" 
+                                                  onsubmit="return confirm('Ești sigur că vrei să blochezi acest utilizator? Nu va mai putea intra în grup.');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="membershipId" value="@member.MembershipId" />
+                                                <button type="submit" class="btn btn-dark btn-sm">
+                                                    <i class="bi bi-slash-circle"></i> Blochează
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -90,11 +98,19 @@
                                             </small>
                                         </div>
                                         <form asp-action="RemoveMember" method="post" 
-                                              onsubmit="return confirm('Ești sigur că vrei să elimini acest membru?');">
+                                              onsubmit="return confirm('Ești sigur că vrei să elimini acest membru?');" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="membershipId" value="@member.MembershipId" />
                                             <button type="submit" class="btn btn-danger btn-sm">
                                                 <i class="bi bi-person-dash"></i> Elimină
+                                            </button>
+                                        </form>
+                                        <form asp-action="BlockMember" method="post" 
+                                              onsubmit="return confirm('Ești sigur că vrei să blochezi acest membru? Nu va mai putea intra în grup.');" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="membershipId" value="@member.MembershipId" />
+                                            <button type="submit" class="btn btn-dark btn-sm">
+                                                <i class="bi bi-slash-circle"></i> Blochează
                                             </button>
                                         </form>
                                     </div>

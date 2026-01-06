@@ -171,6 +171,12 @@ namespace ProiectDAW.Controllers
 
             if (existingMembership != null)
             {
+                if (existingMembership.IsBanned)
+                {
+                    TempData["ErrorMessage"] = "Nu te poți alătura acestui grup deoarece ai fost blocat.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 TempData["ErrorMessage"] = "Ai deja o cerere de alăturare la acest grup.";
                 return RedirectToAction(nameof(Details), new { id });
             }
@@ -196,18 +202,65 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> Leave(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var membership = await _context.GroupMembers
-                .FirstOrDefaultAsync(m => m.GroupId == id && m.UserId == currentUser.Id);
+            var group = await _context.Groups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.Id == id);
+            
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var membership = group.Members
+                .FirstOrDefault(m => m.UserId == currentUser.Id);
 
             if (membership == null)
             {
                 return NotFound();
             }
 
+            // Check if owner is leaving
+            if (group.OwnerId == currentUser.Id)
+            {
+                // Find oldest accepted member to be successor
+                var successor = group.Members
+                    .Where(m => m.IsAccepted && m.UserId != currentUser.Id && !m.IsBanned)
+                    .OrderBy(m => m.JoinedDate)
+                    .FirstOrDefault();
+
+                if (successor != null)
+                {
+                    // Transfer ownership
+                    group.OwnerId = successor.UserId;
+                    TempData["SuccessMessage"] = "Ai părăsit grupul. Rolul de moderator a fost transferat automat.";
+                }
+                else
+                {
+                    // No successor found (group is empty or only has pending/banned members), delete group
+                    // Delete all messages first
+                    var messages = await _context.GroupMessages.Where(m => m.GroupId == id).ToListAsync();
+                    _context.GroupMessages.RemoveRange(messages);
+                    
+                    // Remove all members
+                    _context.GroupMembers.RemoveRange(group.Members);
+                    
+                    // Remove group
+                    _context.Groups.Remove(group);
+                    
+                    await _context.SaveChangesAsync();
+                    
+                    TempData["SuccessMessage"] = "Grupul a fost șters deoarece ai fost ultimul membru (moderator).";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Ai părăsit grupul cu succes.";
+            }
+
             _context.GroupMembers.Remove(membership);
             await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Ai părăsit grupul cu succes.";
+            
             return RedirectToAction(nameof(Index));
         }
 
@@ -304,6 +357,41 @@ namespace ProiectDAW.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Membrul a fost eliminat din grup.";
+            return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
+        }
+
+        // POST: Group/BlockMember
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BlockMember(int membershipId)
+        {
+            var membership = await _context.GroupMembers
+                .Include(m => m.Group)
+                .FirstOrDefaultAsync(m => m.Id == membershipId);
+
+            if (membership == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (membership.Group.OwnerId != currentUser.Id)
+            {
+                return Forbid();
+            }
+            
+            // Cannot block self (should correspond to leave logic instead)
+            if (membership.UserId == currentUser.Id) 
+            {
+                 TempData["ErrorMessage"] = "Nu te poți bloca singur.";
+                 return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
+            }
+
+            membership.IsAccepted = false;
+            membership.IsBanned = true;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Utilizatorul a fost blocat și nu va mai putea intra în grup.";
             return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
         }
 
