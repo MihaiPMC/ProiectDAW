@@ -67,6 +67,9 @@
                         <a asp-controller="Follows" asp-action="Requests" class="btn btn-info w-100 mb-2 text-white">
                             <i class="bi bi-person-plus"></i> Follow Requests
                         </a>
+                        <a asp-controller="Follows" asp-action="MyFollowers" class="btn btn-secondary w-100 mb-2">
+                            <i class="bi bi-people"></i> Manage Followers
+                        </a>
                     }
                     else if (User.Identity.IsAuthenticated)
                     {

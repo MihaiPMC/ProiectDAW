@@ -99,7 +99,7 @@ namespace ProiectDAW.Controllers
                 return NotFound();
             }
 
-            // Verifică dacă utilizatorul este Editor sau Administrator
+            // Verify if user is Editor or Administrator
             var roles = await _userManager.GetRolesAsync(user);
             var isEditor = roles.Contains("Editor") || roles.Contains("Administrator");
 
@@ -156,10 +156,10 @@ namespace ProiectDAW.Controllers
             }
             else
             {
-                // Profilul este public SAU suntem prieteni/eu insumi - afișează toate informațiile
+                // Profile is public OR we are friends/self - show all info
                 model.IsLimitedView = false;
                 
-                // Adaugă statistici suplimentare
+                // Add additional statistics
                 model.ArticlesCount = await _context.NewsArticles
                     .Where(a => a.EditorId == user.Id)
                     .CountAsync();
@@ -211,10 +211,10 @@ namespace ProiectDAW.Controllers
                 return NotFound();
             }
 
-            // Validare custom: imaginea este obligatorie doar dacă nu există deja una
+            // Validare custom: imaginea este obligatorie doar dacă nu există deja una -> Custom validation: profile picture is required only if one doesn't already exist
             if (model.ProfilePicture == null && string.IsNullOrEmpty(user.ProfilePicturePath))
             {
-                ModelState.AddModelError("ProfilePicture", "Imaginea de profil este obligatorie");
+                ModelState.AddModelError("ProfilePicture", "Profile picture is required");
             }
 
             if (!ModelState.IsValid)
@@ -223,16 +223,16 @@ namespace ProiectDAW.Controllers
                 return View(model);
             }
 
-            // Actualizează informațiile de bază
+            // Update basic information
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Description = model.Description;
             user.IsProfilePrivate = model.IsProfilePrivate;
 
-            // Procesează imaginea de profil dacă a fost încărcată
+            // Process profile picture if uploaded
             if (model.ProfilePicture != null)
             {
-                // Șterge imaginea veche dacă există
+                // Delete old image if exists
                 if (!string.IsNullOrEmpty(user.ProfilePicturePath))
                 {
                     var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePicturePath.TrimStart('/'));
@@ -242,7 +242,7 @@ namespace ProiectDAW.Controllers
                     }
                 }
 
-                // Salvează imaginea nouă
+                // Save new image
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -260,7 +260,7 @@ namespace ProiectDAW.Controllers
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                TempData["SuccessMessage"] = "Profilul a fost actualizat cu succes!";
+                TempData["SuccessMessage"] = "Profile updated successfully!";
                 return RedirectToAction(nameof(ViewProfile), new { id = user.Id });
             }
 
@@ -316,7 +316,7 @@ namespace ProiectDAW.Controllers
         public bool IsLimitedView { get; set; }
         public DateTime CreatedAt { get; set; }
         
-        // Informații suplimentare pentru profilul public
+        // Additional information for public profile
         public int ArticlesCount { get; set; }
         public int FollowersCount { get; set; }
         public List<NewsArticle> Articles { get; set; } = new List<NewsArticle>();
@@ -328,16 +328,16 @@ namespace ProiectDAW.Controllers
 
     public class EditProfileViewModel
     {
-        [Required(ErrorMessage = "Prenumele este obligatoriu")]
-        [StringLength(100, ErrorMessage = "Prenumele nu poate depăși 100 de caractere")]
+        [Required(ErrorMessage = "First Name is required")]
+        [StringLength(100, ErrorMessage = "First Name cannot exceed 100 characters")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Numele este obligatoriu")]
-        [StringLength(100, ErrorMessage = "Numele nu poate depăși 100 de caractere")]
+        [Required(ErrorMessage = "Last Name is required")]
+        [StringLength(100, ErrorMessage = "Last Name cannot exceed 100 characters")]
         public string LastName { get; set; }
 
-        [Required(ErrorMessage = "Descrierea este obligatorie")]
-        [StringLength(500, ErrorMessage = "Descrierea nu poate depăși 500 de caractere")]
+        [Required(ErrorMessage = "Description is required")]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         public string Description { get; set; }
 
         public IFormFile? ProfilePicture { get; set; }

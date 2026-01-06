@@ -1,6 +1,6 @@
 @model ProiectDAW.Controllers.EditProfileViewModel
 @{
-    ViewData["Title"] = "Editare Profil";
+    ViewData["Title"] = "Edit Profile";
 }
 
 <div class="container mt-4">
@@ -8,35 +8,35 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0">Editare Profil</h3>
+                    <h3 class="mb-0">Edit Profile</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="FirstName" class="form-label">Prenume <span class="text-danger">*</span></label>
+                            <label asp-for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
                             <input asp-for="FirstName" class="form-control" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="LastName" class="form-label">Nume <span class="text-danger">*</span></label>
+                            <label asp-for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                             <input asp-for="LastName" class="form-control" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Descriere <span class="text-danger">*</span></label>
+                            <label asp-for="Description" class="form-label">Description <span class="text-danger">*</span></label>
                             <textarea asp-for="Description" class="form-control" rows="4" 
-                                      placeholder="Scrie câteva cuvinte despre tine..."></textarea>
+                                      placeholder="Write a few words about yourself..."></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
-                            <small class="form-text text-muted">Maxim 500 de caractere</small>
+                            <small class="form-text text-muted">Maximum 500 characters</small>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="ProfilePicture" class="form-label">
-                                Imagine de profil 
+                                Profile Picture
                                 @if (string.IsNullOrEmpty(Model.CurrentProfilePicturePath))
                                 {
                                     <span class="text-danger">*</span>
@@ -46,13 +46,13 @@
                             @if (!string.IsNullOrEmpty(Model.CurrentProfilePicturePath))
                             {
                                 <div class="mb-2">
-                                    <p class="mb-1">Imaginea curentă:</p>
+                                    <p class="mb-1">Current picture:</p>
                                     <img src="@Model.CurrentProfilePicturePath" 
                                          alt="Current profile picture" 
                                          class="rounded-circle"
                                          style="width: 100px; height: 100px; object-fit: cover;" />
                                 </div>
-                                <p class="text-muted small">Selectează o imagine nouă pentru a o schimba</p>
+                                <p class="text-muted small">Select a new image to change it</p>
                             }
                             
                             <input type="file" 
@@ -60,27 +60,27 @@
                                    class="form-control" 
                                    accept="image/*" />
                             <span asp-validation-for="ProfilePicture" class="text-danger"></span>
-                            <small class="form-text text-muted">Formate acceptate: JPG, PNG, GIF (max 5MB)</small>
+                            <small class="form-text text-muted">Accepted formats: JPG, PNG, GIF (max 5MB)</small>
                         </div>
 
                         <div class="mb-3">
                             <div class="form-check">
                                 <input asp-for="IsProfilePrivate" class="form-check-input" type="checkbox" />
                                 <label asp-for="IsProfilePrivate" class="form-check-label">
-                                    <i class="bi bi-lock"></i> Profil privat
+                                    <i class="bi bi-lock"></i> Private Profile
                                 </label>
                             </div>
                             <small class="form-text text-muted">
-                                Dacă profilul este privat, doar informațiile de bază (nume, descriere și poză) vor fi vizibile pentru alți utilizatori.
+                                If the profile is private, only basic information (name, description, and picture) will be visible to other users.
                             </small>
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <a asp-action="MyProfile" class="btn btn-secondary">
-                                <i class="bi bi-x"></i> Anulează
+                                <i class="bi bi-x"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> Salvează modificările
+                                <i class="bi bi-check"></i> Save Changes
                             </button>
                         </div>
                     </form>
@@ -88,7 +88,7 @@
             </div>
 
             <div class="alert alert-info mt-3">
-                <strong><i class="bi bi-info-circle"></i> Notă:</strong> Toate câmpurile marcate cu <span class="text-danger">*</span> sunt obligatorii.
+                <strong><i class="bi bi-info-circle"></i> Note:</strong> All fields marked with <span class="text-danger">*</span> are mandatory.
             </div>
         </div>
     </div>
@@ -98,7 +98,7 @@
     <partial name="_ValidationScriptsPartial" />
     
     <script>
-        // Preview pentru imaginea de profil
+        // Profile picture preview
         document.querySelector('input[type="file"]').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 var reader = new FileReader();

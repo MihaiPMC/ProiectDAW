@@ -1,10 +1,10 @@
 @model ProiectDAW.Controllers.ManageMembersViewModel
 @{
-    ViewData["Title"] = "Gestionează Membri - " + Model.GroupName;
+    ViewData["Title"] = "Manage Members - " + Model.GroupName;
 }
 
 <div class="container mt-4">
-    <h2><i class="bi bi-people-fill"></i> Gestionează Membri - @Model.GroupName</h2>
+    <h2><i class="bi bi-people-fill"></i> Manage Members - @Model.GroupName</h2>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -19,7 +19,7 @@
             <div class="card">
                 <div class="card-header bg-warning">
                     <h5 class="mb-0">
-                        <i class="bi bi-clock"></i> Cereri în Așteptare (@Model.PendingMembers.Count)
+                        <i class="bi bi-clock"></i> Pending Requests (@Model.PendingMembers.Count)
                     </h5>
                 </div>
                 <div class="card-body">
@@ -33,7 +33,7 @@
                                         <div>
                                             <h6 class="mb-1">@member.UserName</h6>
                                             <small class="text-muted">
-                                                Cerere din: @member.RequestDate.ToString("dd MMM yyyy HH:mm")
+                                                Request from: @member.RequestDate.ToString("dd MMM yyyy HH:mm")
                                             </small>
                                         </div>
                                         <div class="btn-group" role="group">
@@ -41,23 +41,23 @@
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="membershipId" value="@member.MembershipId" />
                                                 <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="bi bi-check-circle"></i> Acceptă
+                                                    <i class="bi bi-check-circle"></i> Accept
                                                 </button>
                                             </form>
                                             <form asp-action="RemoveMember" method="post" style="display: inline;" 
-                                                  onsubmit="return confirm('Ești sigur că vrei să respingi această cerere?');">
+                                                  onsubmit="return confirm('Are you sure you want to reject this request?');">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="membershipId" value="@member.MembershipId" />
                                                 <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="bi bi-x-circle"></i> Respinge
+                                                    <i class="bi bi-x-circle"></i> Reject
                                                 </button>
                                             </form>
                                             <form asp-action="BlockMember" method="post" style="display: inline;" 
-                                                  onsubmit="return confirm('Ești sigur că vrei să blochezi acest utilizator? Nu va mai putea intra în grup.');">
+                                                  onsubmit="return confirm('Are you sure you want to block this user? They will not be able to join the group again.');">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="membershipId" value="@member.MembershipId" />
                                                 <button type="submit" class="btn btn-dark btn-sm">
-                                                    <i class="bi bi-slash-circle"></i> Blochează
+                                                    <i class="bi bi-slash-circle"></i> Block
                                                 </button>
                                             </form>
                                         </div>
@@ -69,7 +69,7 @@
                     else
                     {
                         <p class="text-muted text-center mb-0">
-                            <i class="bi bi-info-circle"></i> Nu există cereri în așteptare.
+                            <i class="bi bi-info-circle"></i> No pending requests.
                         </p>
                     }
                 </div>
@@ -80,7 +80,7 @@
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="bi bi-check-circle"></i> Membri Acceptați (@Model.AcceptedMembers.Count)
+                        <i class="bi bi-check-circle"></i> Accepted Members (@Model.AcceptedMembers.Count)
                     </h5>
                 </div>
                 <div class="card-body">
@@ -94,25 +94,27 @@
                                         <div>
                                             <h6 class="mb-1">@member.UserName</h6>
                                             <small class="text-muted">
-                                                Membru din: @member.RequestDate.ToString("dd MMM yyyy")
+                                                Member since: @member.RequestDate.ToString("dd MMM yyyy")
                                             </small>
                                         </div>
-                                        <form asp-action="RemoveMember" method="post" 
-                                              onsubmit="return confirm('Ești sigur că vrei să elimini acest membru?');" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="membershipId" value="@member.MembershipId" />
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="bi bi-person-dash"></i> Elimină
-                                            </button>
-                                        </form>
-                                        <form asp-action="BlockMember" method="post" 
-                                              onsubmit="return confirm('Ești sigur că vrei să blochezi acest membru? Nu va mai putea intra în grup.');" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="membershipId" value="@member.MembershipId" />
-                                            <button type="submit" class="btn btn-dark btn-sm">
-                                                <i class="bi bi-slash-circle"></i> Blochează
-                                            </button>
-                                        </form>
+                                        <div>
+                                            <form asp-action="RemoveMember" method="post" 
+                                                  onsubmit="return confirm('Are you sure you want to remove this member?');" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="membershipId" value="@member.MembershipId" />
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-person-dash"></i> Remove
+                                                </button>
+                                            </form>
+                                            <form asp-action="BlockMember" method="post" 
+                                                  onsubmit="return confirm('Are you sure you want to block this user? They will not be able to join the group again.');" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="membershipId" value="@member.MembershipId" />
+                                                <button type="submit" class="btn btn-dark btn-sm">
+                                                    <i class="bi bi-slash-circle"></i> Block
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -121,7 +123,7 @@
                     else
                     {
                         <p class="text-muted text-center mb-0">
-                            <i class="bi bi-info-circle"></i> Nu există membri acceptați încă.
+                            <i class="bi bi-info-circle"></i> No accepted members yet.
                         </p>
                     }
                 </div>
@@ -131,7 +133,7 @@
 
     <div class="mt-3">
         <a asp-action="Details" asp-route-id="@Model.GroupId" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Înapoi la Grup
+            <i class="bi bi-arrow-left"></i> Back to Group
         </a>
     </div>
 </div>

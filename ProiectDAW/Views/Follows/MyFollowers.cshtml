@@ -1,0 +1,103 @@
+@model IEnumerable<ProiectDAW.Models.Follow>
+
+@{
+    ViewData["Title"] = "Followers";
+    var blockedUsers = ViewBag.BlockedUsers as List<ProiectDAW.Models.Follow>;
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">My Followers</h1>
+            <p class="lead text-muted">Manage people who follow you.</p>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <i class="bi bi-people fs-4 d-block mb-3"></i>
+            You have no followers yet.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var follow in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center">
+                            @if (!string.IsNullOrEmpty(follow.Follower.ProfilePicturePath))
+                            {
+                                <img src="@follow.Follower.ProfilePicturePath" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;" alt="@follow.Follower.FirstName @follow.Follower.LastName">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; color: white; font-size: 2.5rem;">
+                                    @(follow.Follower.FirstName?[0])@(follow.Follower.LastName?[0])
+                                </div>
+                            }
+                            
+                            <h5 class="card-title">@follow.Follower.FirstName @follow.Follower.LastName</h5>
+                            <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@follow.FollowerId" class="btn btn-sm btn-link text-decoration-none mb-3">View Profile</a>
+                            
+                            <div class="d-grid gap-2">
+                                <form asp-action="RemoveFollower" asp-controller="Follows" method="post" class="d-grid" onsubmit="return confirm('Are you sure you want to remove this follower?');">
+                                    <input type="hidden" name="followerId" value="@follow.FollowerId" />
+                                    <button type="submit" class="btn btn-outline-warning">Remove</button>
+                                </form>
+                                <form asp-action="BlockUser" asp-controller="Follows" method="post" class="d-grid" onsubmit="return confirm('Are you sure you want to block this user?');">
+                                    <input type="hidden" name="followerId" value="@follow.FollowerId" />
+                                    <button type="submit" class="btn btn-outline-danger">Block</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (blockedUsers != null && blockedUsers.Any())
+    {
+        <hr class="my-5" />
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="display-6 text-danger">Blocked Users</h2>
+                <p class="text-muted">These users can no longer follow you.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var follow in blockedUsers)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0 bg-light">
+                        <div class="card-body text-center opacity-75">
+                             @if (!string.IsNullOrEmpty(follow.Follower.ProfilePicturePath))
+                            {
+                                <img src="@follow.Follower.ProfilePicturePath" class="rounded-circle mb-3 grayscale" style="width: 100px; height: 100px; object-fit: cover; filter: grayscale(100%);" alt="@follow.Follower.FirstName @follow.Follower.LastName">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; color: white; font-size: 2.5rem;">
+                                    @(follow.Follower.FirstName?[0])@(follow.Follower.LastName?[0])
+                                </div>
+                            }
+
+                            <h5 class="card-title text-muted">@follow.Follower.FirstName @follow.Follower.LastName</h5>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <form asp-action="UnblockUser" asp-controller="Follows" method="post" class="d-grid">
+                                    <input type="hidden" name="followerId" value="@follow.FollowerId" />
+                                    <button type="submit" class="btn btn-secondary">Unblock</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

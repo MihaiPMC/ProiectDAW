@@ -1,14 +1,14 @@
 @model IEnumerable<ProiectDAW.Models.Follow>
 
 @{
-    ViewData["Title"] = "Cereri de urmărire";
+    ViewData["Title"] = "Follow Requests";
 }
 
 <div class="container py-5">
     <div class="row mb-4">
         <div class="col">
-            <h1 class="display-4">Cereri de urmărire</h1>
-            <p class="lead text-muted">Gestionează cererile de la utilizatorii care vor să te urmărească.</p>
+            <h1 class="display-4">Follow Requests</h1>
+            <p class="lead text-muted">Manage requests from users who want to follow you.</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
     {
         <div class="alert alert-info text-center" role="alert">
             <i class="bi bi-inbox fs-4 d-block mb-3"></i>
-            Nu ai nicio cerere de urmărire în așteptare.
+            You have no pending follow requests.
         </div>
     }
     else
@@ -43,16 +43,16 @@
                             <div class="d-grid gap-2 mt-4">
                                 <form asp-action="AcceptRequest" asp-controller="Follows" method="post" class="d-grid">
                                     <input type="hidden" name="requestId" value="@request.Id" />
-                                    <button type="submit" class="btn btn-primary">Acceptă</button>
+                                    <button type="submit" class="btn btn-primary">Accept</button>
                                 </form>
                                 <form asp-action="DeclineRequest" asp-controller="Follows" method="post" class="d-grid">
                                     <input type="hidden" name="requestId" value="@request.Id" />
-                                    <button type="submit" class="btn btn-outline-danger">Refuză</button>
+                                    <button type="submit" class="btn btn-outline-danger">Decline</button>
                                 </form>
                             </div>
                         </div>
                         <div class="card-footer text-muted text-center small bg-transparent border-top-0">
-                            Primită: @request.RequestDate.ToString("dd MMM yyyy")
+                            Received: @request.RequestDate.ToString("dd MMM yyyy")
                         </div>
                     </div>
                 </div>

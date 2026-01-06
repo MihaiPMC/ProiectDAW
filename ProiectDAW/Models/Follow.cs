@@ -7,7 +7,8 @@ namespace ProiectDAW.Models
     {
         Pending = 0,
         Approved = 1,
-        Rejected = 2
+        Rejected = 2,
+        Blocked = 3
     }
 
     public class Follow

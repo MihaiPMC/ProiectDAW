@@ -91,7 +91,7 @@ namespace ProiectDAW.Controllers
             _context.GroupMembers.Add(member);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Grupul a fost creat cu succes!";
+            TempData["SuccessMessage"] = "Group successfully created!";
             return RedirectToAction(nameof(Details), new { id = group.Id });
         }
 
@@ -173,11 +173,11 @@ namespace ProiectDAW.Controllers
             {
                 if (existingMembership.IsBanned)
                 {
-                    TempData["ErrorMessage"] = "Nu te poți alătura acestui grup deoarece ai fost blocat.";
+                    TempData["ErrorMessage"] = "You cannot join this group because you are blocked.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                TempData["ErrorMessage"] = "Ai deja o cerere de alăturare la acest grup.";
+                TempData["ErrorMessage"] = "You already have a join request for this group.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
@@ -192,7 +192,7 @@ namespace ProiectDAW.Controllers
             _context.GroupMembers.Add(membership);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Cererea ta de alăturare a fost trimisă moderatorului.";
+            TempData["SuccessMessage"] = "Your join request has been sent to the moderator.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -232,7 +232,7 @@ namespace ProiectDAW.Controllers
                 {
                     // Transfer ownership
                     group.OwnerId = successor.UserId;
-                    TempData["SuccessMessage"] = "Ai părăsit grupul. Rolul de moderator a fost transferat automat.";
+                    TempData["SuccessMessage"] = "You left the group. The moderator role was automatically transferred.";
                 }
                 else
                 {
@@ -249,13 +249,13 @@ namespace ProiectDAW.Controllers
                     
                     await _context.SaveChangesAsync();
                     
-                    TempData["SuccessMessage"] = "Grupul a fost șters deoarece ai fost ultimul membru (moderator).";
+                    TempData["SuccessMessage"] = "The group was deleted because you were the last member (moderator).";
                     return RedirectToAction(nameof(Index));
                 }
             }
             else
             {
-                TempData["SuccessMessage"] = "Ai părăsit grupul cu succes.";
+                TempData["SuccessMessage"] = "You successfully left the group.";
             }
 
             _context.GroupMembers.Remove(membership);
@@ -329,7 +329,7 @@ namespace ProiectDAW.Controllers
             membership.IsAccepted = true;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Membrul a fost acceptat în grup.";
+            TempData["SuccessMessage"] = "Member accepted into the group.";
             return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
         }
 
@@ -356,7 +356,7 @@ namespace ProiectDAW.Controllers
             _context.GroupMembers.Remove(membership);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Membrul a fost eliminat din grup.";
+            TempData["SuccessMessage"] = "Member removed from the group.";
             return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
         }
 
@@ -383,7 +383,7 @@ namespace ProiectDAW.Controllers
             // Cannot block self (should correspond to leave logic instead)
             if (membership.UserId == currentUser.Id) 
             {
-                 TempData["ErrorMessage"] = "Nu te poți bloca singur.";
+                 TempData["ErrorMessage"] = "You cannot block yourself.";
                  return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
             }
 
@@ -391,7 +391,7 @@ namespace ProiectDAW.Controllers
             membership.IsBanned = true;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Utilizatorul a fost blocat și nu va mai putea intra în grup.";
+            TempData["SuccessMessage"] = "User has been blocked and will no longer be able to join the group.";
             return RedirectToAction(nameof(ManageMembers), new { id = membership.GroupId });
         }
 
@@ -402,7 +402,7 @@ namespace ProiectDAW.Controllers
         {
             if (string.IsNullOrWhiteSpace(content))
             {
-                TempData["ErrorMessage"] = "Mesajul nu poate fi gol.";
+                TempData["ErrorMessage"] = "Message cannot be empty.";
                 return RedirectToAction(nameof(Details), new { id = groupId });
             }
 
@@ -413,7 +413,7 @@ namespace ProiectDAW.Controllers
             var group = await _context.Groups.FindAsync(groupId);
             if (membership == null && group?.OwnerId != currentUser.Id)
             {
-                TempData["ErrorMessage"] = "Nu faci parte din acest grup.";
+                TempData["ErrorMessage"] = "You are not a member of this group.";
                 return RedirectToAction(nameof(Details), new { id = groupId });
             }
 
@@ -438,7 +438,7 @@ namespace ProiectDAW.Controllers
         {
             if (string.IsNullOrWhiteSpace(content))
             {
-                TempData["ErrorMessage"] = "Mesajul nu poate fi gol.";
+                TempData["ErrorMessage"] = "Message cannot be empty.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -482,7 +482,7 @@ namespace ProiectDAW.Controllers
             _context.GroupMessages.Remove(message);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Mesajul a fost șters.";
+            TempData["SuccessMessage"] = "Message deleted.";
             return RedirectToAction(nameof(Details), new { id = groupId });
         }
 
@@ -513,7 +513,7 @@ namespace ProiectDAW.Controllers
             _context.Groups.Remove(group);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Grupul a fost șters cu succes.";
+            TempData["SuccessMessage"] = "Group successfully deleted.";
             return RedirectToAction(nameof(Index));
         }
     }
@@ -540,12 +540,12 @@ namespace ProiectDAW.Controllers
 
     public class CreateGroupViewModel
     {
-        [Required(ErrorMessage = "Numele grupului este obligatoriu")]
-        [StringLength(100, ErrorMessage = "Numele nu poate depăși 100 de caractere")]
+        [Required(ErrorMessage = "Group name is required")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Descrierea este obligatorie")]
-        [StringLength(500, ErrorMessage = "Descrierea nu poate depăși 500 de caractere")]
+        [Required(ErrorMessage = "Description is required")]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         public string Description { get; set; } = string.Empty;
     }
 

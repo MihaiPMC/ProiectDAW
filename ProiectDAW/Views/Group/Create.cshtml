@@ -1,6 +1,6 @@
 @model ProiectDAW.Controllers.CreateGroupViewModel
 @{
-    ViewData["Title"] = "Creează Grup";
+    ViewData["Title"] = "Create Group";
 }
 
 <div class="container mt-4">
@@ -8,7 +8,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Creează Grup Nou</h3>
+                    <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Create New Group</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" method="post">
@@ -16,32 +16,32 @@
 
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">
-                                Nume Grup <span class="text-danger">*</span>
+                                Group Name <span class="text-danger">*</span>
                             </label>
-                            <input asp-for="Name" class="form-control" placeholder="Ex: Grupul Editorilor de Știri" />
+                            <input asp-for="Name" class="form-control" placeholder="Ex: News Editors Group" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Description" class="form-label">
-                                Descriere <span class="text-danger">*</span>
+                                Description <span class="text-danger">*</span>
                             </label>
                             <textarea asp-for="Description" class="form-control" rows="4" 
-                                      placeholder="Descrie scopul grupului..."></textarea>
+                                      placeholder="Describe the purpose of the group..."></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
-                            <small class="form-text text-muted">Maxim 500 de caractere</small>
+                            <small class="form-text text-muted">Maximum 500 characters</small>
                         </div>
 
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> <strong>Notă:</strong> Ca moderator al acestui grup, vei putea accepta sau respinge cererile de alăturare ale utilizatorilor.
+                            <i class="bi bi-info-circle"></i> <strong>Note:</strong> As the moderator of this group, you will be able to accept or reject user join requests.
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-x"></i> Anulează
+                                <i class="bi bi-x"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> Creează Grup
+                                <i class="bi bi-check"></i> Create Group
                             </button>
                         </div>
                     </form>

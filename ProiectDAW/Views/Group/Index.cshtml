@@ -1,15 +1,15 @@
 @model ProiectDAW.Controllers.GroupIndexViewModel
 @{
-    ViewData["Title"] = "Grupuri";
+    ViewData["Title"] = "Groups";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-people-fill"></i> Grupuri</h2>
+        <h2><i class="bi bi-people-fill"></i> Groups</h2>
         @if (User.IsInRole("Editor") || User.IsInRole("Administrator"))
         {
             <a asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Creează Grup
+                <i class="bi bi-plus-circle"></i> Create Group
             </a>
         }
     </div>
@@ -41,13 +41,13 @@
                                 @if (group.IsMember)
                                 {
                                     <span class="badge bg-success">
-                                        <i class="bi bi-check-circle"></i> Membru
+                                        <i class="bi bi-check-circle"></i> Member
                                     </span>
                                 }
                                 @if (group.HasPendingRequest)
                                 {
                                     <span class="badge bg-secondary">
-                                        <i class="bi bi-clock"></i> În așteptare
+                                        <i class="bi bi-clock"></i> Pending
                                     </span>
                                 }
                             </h5>
@@ -64,16 +64,16 @@
                             
                             <div class="mb-3">
                                 <small class="text-muted">
-                                    <i class="bi bi-people"></i> @group.MembersCount membri
+                                    <i class="bi bi-people"></i> @group.MembersCount members
                                 </small>
                             </div>
                             
                             <a asp-action="Details" asp-route-id="@group.Id" class="btn btn-primary btn-sm w-100">
-                                <i class="bi bi-eye"></i> Vezi Detalii
+                                <i class="bi bi-eye"></i> View Details
                             </a>
                         </div>
                         <div class="card-footer text-muted">
-                            <small>Creat: @group.CreatedDate.ToString("dd MMM yyyy")</small>
+                            <small>Created: @group.CreatedDate.ToString("dd MMM yyyy")</small>
                         </div>
                     </div>
                 </div>
@@ -83,10 +83,10 @@
     else
     {
         <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> Nu există grupuri create încă.
+            <i class="bi bi-info-circle"></i> No groups created yet.
             @if (User.IsInRole("Editor") || User.IsInRole("Administrator"))
             {
-                <text>Creează primul grup!</text>
+                <text>Create the first group!</text>
             }
         </div>
     }

@@ -41,6 +41,10 @@ namespace ProiectDAW.Controllers
             {
                 // If it was rejected, maybe allow re-request? For now, just say already requested.
                 // Or if we want to toggle, Unfollow. But this is SendRequest.
+                if (existingFollow.Status == FollowStatus.Blocked)
+                {
+                    return BadRequest("You are blocked from following this user.");
+                }
                 return RedirectToAction("ViewProfile", "Profile", new { id = userId });
             }
 
@@ -118,6 +122,97 @@ namespace ProiectDAW.Controllers
                 .ToListAsync();
 
             return View(requests);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyFollowers()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
+
+            var followers = await _context.Follows
+                .Include(f => f.Follower)
+                .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Approved)
+                .ToListAsync();
+
+            var blockedUsers = await _context.Follows
+                .Include(f => f.Follower)
+                .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Blocked)
+                .ToListAsync();
+
+            ViewBag.BlockedUsers = blockedUsers;
+
+            return View(followers);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveFollower(string followerId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
+
+            var follow = await _context.Follows
+                .FirstOrDefaultAsync(f => f.EditorId == currentUser.Id && f.FollowerId == followerId);
+
+            if (follow != null)
+            {
+                _context.Follows.Remove(follow);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("MyFollowers");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BlockUser(string followerId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
+
+            var follow = await _context.Follows
+                .FirstOrDefaultAsync(f => f.EditorId == currentUser.Id && f.FollowerId == followerId);
+
+            if (follow != null)
+            {
+                follow.Status = FollowStatus.Blocked;
+                await _context.SaveChangesAsync();
+            }
+            else 
+            {
+                // If checking only "followers you have", we might skip this. 
+                // But to be robust, we can block someone even if they don't follow us yet?
+                // The UI will likely only show this button on existing followers.
+                // But if needed we can create a new Blocked record.
+                var newBlock = new Follow 
+                {
+                    EditorId = currentUser.Id,
+                    FollowerId = followerId,
+                    RequestDate = DateTime.Now,
+                    Status = FollowStatus.Blocked
+                };
+                _context.Follows.Add(newBlock);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("MyFollowers");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UnblockUser(string followerId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
+
+            var follow = await _context.Follows
+                .FirstOrDefaultAsync(f => f.EditorId == currentUser.Id && f.FollowerId == followerId && f.Status == FollowStatus.Blocked);
+
+            if (follow != null)
+            {
+                _context.Follows.Remove(follow); // Removing block means they are no longer following/blocked. Status resets to nothing.
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("MyFollowers");
         }
     }
 }
