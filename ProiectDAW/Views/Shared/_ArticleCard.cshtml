@@ -35,7 +35,40 @@
                 }
             </p>
         </div>
-        <div class="card-footer bg-white border-top-0">
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+            
+            <!-- Voting Section -->
+            @{
+                var userVotes = ViewData["UserArticleVotes"] as Dictionary<int, int>;
+                var articleScores = ViewData["ArticleScores"] as Dictionary<int, int>;
+                
+                int currentVote = 0;
+                if (userVotes != null && userVotes.ContainsKey(Model.Id))
+                {
+                    currentVote = userVotes[Model.Id];
+                }
+
+                int score = 0;
+                if (articleScores != null && articleScores.ContainsKey(Model.Id))
+                {
+                    score = articleScores[Model.Id];
+                }
+            }
+
+            <div class="d-flex align-items-center vote-container" data-article-id="@Model.Id">
+                <button class="btn btn-sm btn-link text-decoration-none p-0 vote-btn upvote @(currentVote == 1 ? "active-up" : "")" 
+                        onclick="voteArticle(this, @Model.Id, 1)">
+                    <i class="bi bi-arrow-up-circle-fill fs-5"></i>
+                </button>
+                
+                <span class="mx-2 fw-bold score-display">@score</span>
+                
+                <button class="btn btn-sm btn-link text-decoration-none p-0 vote-btn downvote @(currentVote == -1 ? "active-down" : "")" 
+                        onclick="voteArticle(this, @Model.Id, -1)">
+                    <i class="bi bi-arrow-down-circle-fill fs-5"></i>
+                </button>
+            </div>
+
             <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Read More</a>
         </div>
     </div>

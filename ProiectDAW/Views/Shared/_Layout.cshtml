@@ -19,6 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/voting.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProiectDAW.styles.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -83,6 +84,10 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/voting.js" asp-append-version="true"></script>
+    <script>
+        var isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

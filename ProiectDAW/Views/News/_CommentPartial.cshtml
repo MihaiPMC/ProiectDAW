@@ -15,7 +15,39 @@
             }
             else
             {
-                <h6 class="mb-1 fw-bold text-primary">@Model.User.FirstName @Model.User.LastName</h6>
+                <div class="d-flex align-items-center gap-2">
+                    <h6 class="mb-0 fw-bold text-primary">@Model.User.FirstName @Model.User.LastName</h6>
+                    
+                    <!-- Comment Voting -->
+                    @{
+                        var commentVotes = ViewData["UserCommentVotes"] as Dictionary<int, int>;
+                        var commentScores = ViewData["CommentScores"] as Dictionary<int, int>;
+                        
+                        int cVote = 0;
+                        if (commentVotes != null && commentVotes.ContainsKey(Model.Id))
+                        {
+                            cVote = commentVotes[Model.Id];
+                        }
+
+                        int cScore = 0;
+                        if (commentScores != null && commentScores.ContainsKey(Model.Id))
+                        {
+                            cScore = commentScores[Model.Id];
+                        }
+                    }
+                    <div class="d-flex align-items-center vote-container small ms-2" data-comment-id="@Model.Id">
+                        <button class="btn btn-sm btn-link text-decoration-none p-0 vote-btn upvote @(cVote == 1 ? "active-up" : "")" 
+                                onclick="voteComment(this, @Model.Id, 1)" style="line-height:0;">
+                            <i class="bi bi-arrow-up-circle-fill"></i>
+                        </button>
+                        <span class="mx-1 fw-bold score-display" style="font-size: 0.9em;">@cScore</span>
+                        <button class="btn btn-sm btn-link text-decoration-none p-0 vote-btn downvote @(cVote == -1 ? "active-down" : "")" 
+                                onclick="voteComment(this, @Model.Id, -1)" style="line-height:0;">
+                            <i class="bi bi-arrow-down-circle-fill"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <small class="text-muted">
                     @Model.PostedDate.ToString("g")
                     @if(Model.IsEdited)

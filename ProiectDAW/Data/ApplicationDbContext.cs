@@ -18,6 +18,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Group> Groups { get; set; }
     public DbSet<GroupMember> GroupMembers { get; set; }
     public DbSet<GroupMessage> GroupMessages { get; set; }
+    public DbSet<ArticleVote> ArticleVotes { get; set; }
+    public DbSet<CommentVote> CommentVotes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -69,6 +71,31 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(gm => gm.Sender)
             .WithMany(u => u.SentGroupMessages)
             .HasForeignKey(gm => gm.SenderId)
-            .OnDelete(DeleteBehavior.Restrict); 
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Vote Configurations
+        builder.Entity<ArticleVote>()
+            .HasOne(v => v.User)
+            .WithMany()
+            .HasForeignKey(v => v.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ArticleVote>()
+            .HasOne(v => v.NewsArticle)
+            .WithMany()
+            .HasForeignKey(v => v.NewsArticleId)
+            .OnDelete(DeleteBehavior.Cascade); // If article is deleted, votes go too
+
+        builder.Entity<CommentVote>()
+            .HasOne(v => v.User)
+            .WithMany()
+            .HasForeignKey(v => v.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<CommentVote>()
+            .HasOne(v => v.Comment)
+            .WithMany()
+            .HasForeignKey(v => v.CommentId)
+            .OnDelete(DeleteBehavior.Cascade); // If comment is deleted, votes go too
     }
 }

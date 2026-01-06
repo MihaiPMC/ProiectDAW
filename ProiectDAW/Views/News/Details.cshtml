@@ -69,8 +69,38 @@
     </div>
 
     <!-- Article Content (Rich Text) -->
-    <div class="article-content fs-5 mb-5">
-        @Html.Raw(Model.Content)
+    <div class="d-flex gap-4">
+        <!-- Voting Sidebar -->
+        <div class="d-flex flex-column align-items-center vote-container" data-article-id="@Model.Id">
+            @{
+                int currentVote = 0;
+                if (ViewData["UserArticleVote"] is int v)
+                {
+                    currentVote = v;
+                }
+
+                int score = 0;
+                if (ViewData["ArticleScore"] is int s)
+                {
+                    score = s;
+                }
+            }
+            <button class="btn btn-link text-decoration-none p-0 vote-btn upvote @(currentVote == 1 ? "active-up" : "")" 
+                    onclick="voteArticle(this, @Model.Id, 1)">
+                <i class="bi bi-arrow-up-circle-fill display-6"></i>
+            </button>
+            
+            <span class="fw-bold fs-4 my-1 score-display">@score</span>
+            
+            <button class="btn btn-link text-decoration-none p-0 vote-btn downvote @(currentVote == -1 ? "active-down" : "")" 
+                    onclick="voteArticle(this, @Model.Id, -1)">
+                <i class="bi bi-arrow-down-circle-fill display-6"></i>
+            </button>
+        </div>
+
+        <div class="article-content fs-5 mb-5 flex-grow-1">
+            @Html.Raw(Model.Content)
+        </div>
     </div>
 
     <hr class="my-5" />

@@ -29,6 +29,23 @@ namespace ProiectDAW.Controllers
                 .Where(n => !n.Editor.IsProfilePrivate)
                 .OrderByDescending(n => n.CreatedDate)
                 .ToListAsync();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = _userManager.GetUserId(User);
+                var userVotes = await _context.ArticleVotes
+                    .Where(v => v.UserId == userId)
+                    .ToDictionaryAsync(v => v.NewsArticleId, v => v.Value);
+                ViewData["UserArticleVotes"] = userVotes;
+            }
+
+            // Load total scores (could be optimized with a GroupBy query or a computed column, but separate query for now)
+            var articleScores = await _context.ArticleVotes
+                .GroupBy(v => v.NewsArticleId)
+                .Select(g => new { ArticleId = g.Key, Score = g.Sum(v => v.Value) })
+                .ToDictionaryAsync(x => x.ArticleId, x => x.Score);
+            ViewData["ArticleScores"] = articleScores;
+
             return View(news);
         }
 
@@ -46,6 +63,37 @@ namespace ProiectDAW.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (article == null) return NotFound();
+
+            if (article == null) return NotFound();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = _userManager.GetUserId(User);
+                
+                // Article Vote
+                var articleVote = await _context.ArticleVotes
+                    .FirstOrDefaultAsync(v => v.NewsArticleId == id && v.UserId == userId);
+                ViewData["UserArticleVote"] = articleVote?.Value ?? 0;
+
+                // Comment Votes
+                var commentVotes = await _context.CommentVotes
+                    .Where(v => v.UserId == userId && v.Comment.NewsArticleId == id)
+                    .ToDictionaryAsync(v => v.CommentId, v => v.Value);
+                ViewData["UserCommentVotes"] = commentVotes;
+            }
+
+            // Article Score
+            ViewData["ArticleScore"] = await _context.ArticleVotes
+                .Where(v => v.NewsArticleId == id)
+                .SumAsync(v => v.Value);
+
+             // Comments Scores
+            var commentScores = await _context.CommentVotes
+                .Where(v => v.Comment.NewsArticleId == id)
+                .GroupBy(v => v.CommentId)
+                .Select(g => new { CommentId = g.Key, Score = g.Sum(v => v.Value) })
+                .ToDictionaryAsync(x => x.CommentId, x => x.Score);
+            ViewData["CommentScores"] = commentScores;
 
             return View(article);
         }
@@ -310,6 +358,104 @@ namespace ProiectDAW.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), new { id = articleId });
+        }
+        // POST: News/VoteArticle
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VoteArticle(int articleId, int voteValue)
+        {
+            if (voteValue < -1 || voteValue > 1) return BadRequest("Invalid vote value.");
+
+            var user = await _userManager.GetUserAsync(User);
+            var existingVote = await _context.ArticleVotes
+                .FirstOrDefaultAsync(v => v.NewsArticleId == articleId && v.UserId == user.Id);
+
+            if (existingVote != null)
+            {
+                // If clicking the same vote again, remove it (toggle off)
+                if (existingVote.Value == voteValue)
+                {
+                    _context.ArticleVotes.Remove(existingVote);
+                }
+                else
+                {
+                    // Update vote
+                    existingVote.Value = voteValue;
+                    _context.Update(existingVote);
+                }
+            }
+            else
+            {
+                // New vote
+                // Only create if voteValue is not 0 (though UI shouldn't send 0)
+                if (voteValue != 0)
+                {
+                    var vote = new ArticleVote
+                    {
+                        NewsArticleId = articleId,
+                        UserId = user.Id,
+                        Value = voteValue
+                    };
+                    _context.ArticleVotes.Add(vote);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Calculate new score
+            var score = await _context.ArticleVotes
+                .Where(v => v.NewsArticleId == articleId)
+                .SumAsync(v => v.Value);
+
+            return Json(new { score = score });
+        }
+
+        // POST: News/VoteComment
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VoteComment(int commentId, int voteValue)
+        {
+            if (voteValue < -1 || voteValue > 1) return BadRequest("Invalid vote value.");
+
+            var user = await _userManager.GetUserAsync(User);
+            var existingVote = await _context.CommentVotes
+                .FirstOrDefaultAsync(v => v.CommentId == commentId && v.UserId == user.Id);
+
+            if (existingVote != null)
+            {
+                if (existingVote.Value == voteValue)
+                {
+                    _context.CommentVotes.Remove(existingVote);
+                }
+                else
+                {
+                    existingVote.Value = voteValue;
+                    _context.Update(existingVote);
+                }
+            }
+            else
+            {
+                if (voteValue != 0)
+                {
+                    var vote = new CommentVote
+                    {
+                        CommentId = commentId,
+                        UserId = user.Id,
+                        Value = voteValue
+                    };
+                    _context.CommentVotes.Add(vote);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            var score = await _context.CommentVotes
+                .Where(v => v.CommentId == commentId)
+                .SumAsync(v => v.Value);
+
+            return Json(new { score = score });
         }
     }
 }
