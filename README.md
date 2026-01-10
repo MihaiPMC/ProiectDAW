@@ -1,6 +1,6 @@
-# ProiectDAW - Platformă de Știri și Socializare
+# AI Stiri - Platformă de Știri și Socializare
 
-ProiectDAW este o aplicație web complexă dezvoltată în **ASP.NET Core MVC (.NET 9.0)**, care combină funcționalități de publicare știri cu elemente de rețea socială și verificare a conținutului folosind Inteligența Artificială.
+AI Stiri este o aplicație web complexă dezvoltată în **ASP.NET Core MVC (.NET 9.0)**, care combină funcționalități de publicare știri cu elemente de rețea socială și verificare a conținutului folosind Inteligența Artificială.
 
 Aplicația permite utilizatorilor să citească și să publice articole, să interacționeze prin voturi și comentarii, să se organizeze în grupuri și să urmărească activitatea altor utilizatori, totul într-un mediu securizat.
 
@@ -106,5 +106,3 @@ Accesează aplicația în browser la adresa indicată în consolă (de obicei `h
 3.  **Publică**: Dacă ai drepturi, folosește opțiunea de a adăuga un articol nou. AI-ul va analiza automat textul.
 4.  **Socializează**: Intră pe profilul altor utilizatori, dă Follow sau alătură-te Grupurilor disponibile.
 
----
-Dezvoltat în cadrul cursului DAW.
