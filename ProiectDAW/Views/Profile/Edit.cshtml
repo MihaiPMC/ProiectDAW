@@ -90,6 +90,32 @@
             <div class="alert alert-info mt-3">
                 <strong><i class="bi bi-info-circle"></i> Note:</strong> All fields marked with <span class="text-danger">*</span> are mandatory.
             </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="bi bi-gear"></i> Account Settings</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Manage your account security and personal data.</p>
+                    <div class="list-group">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person-badge me-2"></i> Account Overview
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Email" class="list-group-item list-group-item-action">
+                            <i class="bi bi-envelope me-2"></i> Manage Email
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="list-group-item list-group-item-action">
+                            <i class="bi bi-key me-2"></i> Change Password
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/TwoFactorAuthentication" class="list-group-item list-group-item-action">
+                            <i class="bi bi-shield-lock me-2"></i> Two-Factor Authentication
+                        </a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/PersonalData" class="list-group-item list-group-item-action">
+                            <i class="bi bi-hdd me-2"></i> Personal Data
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

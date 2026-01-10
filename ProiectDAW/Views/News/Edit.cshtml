@@ -4,76 +4,54 @@
     ViewData["Title"] = "Edit Article";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h2 class="card-title text-center mb-4 text-gradient">Edit Article</h2>
-                    
-                    <form asp-action="Edit" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        <input type="hidden" asp-for="Id" />
-                        
-                        <div class="mb-3">
-                            <label asp-for="Title" class="form-label fw-bold">Title</label>
-                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Article Title" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Cover Image</label>
-                            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
-                            {
-                                <div class="mb-2">
-                                    <img src="@Model.CoverImagePath" alt="Current Cover" class="img-thumbnail" style="height: 150px;" />
-                                    <p class="text-muted small">Current Image</p>
-                                </div>
-                            }
-                            <input type="file" name="coverImage" class="form-control" accept="image/*" />
-                            <small class="text-muted">Leave empty to keep the current image.</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="Content" class="form-label fw-bold">Content</label>
-                            <textarea asp-for="Content" id="summernote"></textarea>
-                            <span asp-validation-for="Content" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
+
+<h2>Edit Article</h2>
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-</div>
+
+    <div class="mb-3">
+        <label asp-for="CoverImagePath" class="form-label">Cover Image</label>
+        <input type="file" name="coverImage" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label"></label>
+        <!-- The asp-for helper will automatically pre-populate the textarea with Model.Content -->
+        <textarea asp-for="Content" id="summernote"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <!-- Include Summernote JS/CSS same as Create -->
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-    
     <script>
-        $(document).ready(function() {
-            $('#summernote').summernote({
-                placeholder: 'Write your article here...',
-                tabsize: 2,
-                height: 400,
-                toolbar: [
-                  ['style', ['style']],
-                  ['font', ['bold', 'underline', 'clear']],
-                  ['color', ['color']],
-                  ['para', ['ul', 'ol', 'paragraph']],
-                  ['table', ['table']],
-                  ['insert', ['link', 'picture', 'video']],
-                  ['view', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
+        $('#summernote').summernote({
+            placeholder: 'Write your article here...',
+            tabsize: 2,
+            height: 400,
+            toolbar: [
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              ['color', ['color']],
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video']],
+              ['view', ['codeview', 'help']]
+            ]
         });
     </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

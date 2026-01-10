@@ -1,29 +1,85 @@
-@model IEnumerable<ProiectDAW.Models.Follow>
+@model ProiectDAW.Models.ManageFollowsViewModel
 
 @{
-    ViewData["Title"] = "Followers";
-    var blockedUsers = ViewBag.BlockedUsers as List<ProiectDAW.Models.Follow>;
+    ViewData["Title"] = "Manage Community";
 }
 
 <div class="container py-5">
     <div class="row mb-4">
         <div class="col">
-            <h1 class="display-4">My Followers</h1>
-            <p class="lead text-muted">Manage people who follow you.</p>
+            <h1 class="display-4">Manage Community</h1>
+            <p class="lead text-muted">Manage your followers and follow requests.</p>
         </div>
     </div>
 
-    @if (!Model.Any())
+    @* --- Follow Requests Section --- *@
+    @if (Model.Requests.Any())
+    {
+        <div class="row mb-3">
+            <div class="col">
+                <h3 class="text-primary"><i class="bi bi-person-plus-fill"></i> Follow Requests</h3>
+                <p class="text-muted">People who want to follow you.</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            @foreach (var request in Model.Requests)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-primary border-2">
+                        <div class="card-body text-center">
+                            @if (!string.IsNullOrEmpty(request.Follower.ProfilePicturePath))
+                            {
+                                <img src="@request.Follower.ProfilePicturePath" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;" alt="@request.Follower.FirstName @request.Follower.LastName">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; color: white; font-size: 2.5rem;">
+                                    @(request.Follower.FirstName?[0])@(request.Follower.LastName?[0])
+                                </div>
+                            }
+                            
+                            <h5 class="card-title">@request.Follower.FirstName @request.Follower.LastName</h5>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <form asp-action="AcceptRequest" asp-controller="Follows" method="post" class="d-grid">
+                                    <input type="hidden" name="requestId" value="@request.Id" />
+                                    <button type="submit" class="btn btn-primary">Accept</button>
+                                </form>
+                                <form asp-action="DeclineRequest" asp-controller="Follows" method="post" class="d-grid">
+                                    <input type="hidden" name="requestId" value="@request.Id" />
+                                    <button type="submit" class="btn btn-outline-danger">Decline</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted text-center small bg-transparent border-top-0">
+                            Received: @request.RequestDate.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <hr class="mb-5" />
+    }
+
+    @* --- My Followers Section --- *@
+    <div class="row mb-3">
+        <div class="col">
+            <h3><i class="bi bi-people"></i> My Followers</h3>
+        </div>
+    </div>
+
+    @if (!Model.Followers.Any())
     {
         <div class="alert alert-info text-center" role="alert">
-            <i class="bi bi-people fs-4 d-block mb-3"></i>
-            You have no followers yet.
+            <i class="bi bi-info-circle fs-4 d-block mb-3"></i>
+            You have no active followers.
         </div>
     }
     else
     {
         <div class="row">
-            @foreach (var follow in Model)
+            @foreach (var follow in Model.Followers)
             {
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
@@ -59,18 +115,19 @@
         </div>
     }
 
-    @if (blockedUsers != null && blockedUsers.Any())
+    @* --- Blocked Users Section --- *@
+    @if (Model.BlockedUsers != null && Model.BlockedUsers.Any())
     {
         <hr class="my-5" />
         <div class="row mb-4">
             <div class="col">
-                <h2 class="display-6 text-danger">Blocked Users</h2>
+                <h3 class="text-danger"><i class="bi bi-slash-circle"></i> Blocked Users</h3>
                 <p class="text-muted">These users can no longer follow you.</p>
             </div>
         </div>
 
         <div class="row">
-            @foreach (var follow in blockedUsers)
+            @foreach (var follow in Model.BlockedUsers)
             {
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm border-0 bg-light">

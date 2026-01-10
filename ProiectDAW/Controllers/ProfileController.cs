@@ -50,6 +50,17 @@ namespace ProiectDAW.Controllers
             // Using logic: if names parts contain the search term.
             searchTerm = searchTerm.ToLower();
             
+            // Get IDs of users who have blocked the current user
+            var blockedByids = new List<string>();
+            if (User.Identity.IsAuthenticated)
+            {
+                var currentUserId = _userManager.GetUserId(User);
+                blockedByids = await _context.Follows
+                    .Where(f => f.FollowerId == currentUserId && f.Status == FollowStatus.Blocked)
+                    .Select(f => f.EditorId)
+                    .ToListAsync();
+            }
+
             var editors = await _userManager.Users
                 .ToListAsync(); // Pull users first to filter client-side for roles if needed, or query efficiently.
                                 // NOTE: complex queries with roles are tricky in LINQ to Entities directly if roles are separate tables.
@@ -59,6 +70,12 @@ namespace ProiectDAW.Controllers
             
             foreach (var user in editors)
             {
+                // Skip if blocked
+                if (blockedByids.Contains(user.Id))
+                {
+                    continue;
+                }
+
                 // Check name match first
                 string fullName = (user.FirstName + " " + user.LastName).ToLower();
                 if (user.FirstName.ToLower().Contains(searchTerm) || 

@@ -92,7 +92,7 @@ namespace ProiectDAW.Controllers
             follow.Status = FollowStatus.Approved;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Requests");
+            return RedirectToAction("MyFollowers");
         }
 
         [HttpPost]
@@ -107,21 +107,13 @@ namespace ProiectDAW.Controllers
             _context.Follows.Remove(follow); // Or set to Rejected if we want to keep history
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Requests");
+            return RedirectToAction("MyFollowers");
         }
 
         [HttpGet]
         public async Task<IActionResult> Requests()
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null) return NotFound();
-
-            var requests = await _context.Follows
-                .Include(f => f.Follower)
-                .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Pending)
-                .ToListAsync();
-
-            return View(requests);
+            return RedirectToAction("MyFollowers");
         }
 
         [HttpGet]
@@ -135,14 +127,24 @@ namespace ProiectDAW.Controllers
                 .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Approved)
                 .ToListAsync();
 
+            var requests = await _context.Follows
+                .Include(f => f.Follower)
+                .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Pending)
+                .ToListAsync();
+
             var blockedUsers = await _context.Follows
                 .Include(f => f.Follower)
                 .Where(f => f.EditorId == currentUser.Id && f.Status == FollowStatus.Blocked)
                 .ToListAsync();
 
-            ViewBag.BlockedUsers = blockedUsers;
+            var viewModel = new ManageFollowsViewModel
+            {
+                Followers = followers,
+                Requests = requests,
+                BlockedUsers = blockedUsers
+            };
 
-            return View(followers);
+            return View(viewModel);
         }
 
         [HttpPost]

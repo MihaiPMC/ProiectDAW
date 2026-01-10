@@ -152,3 +152,45 @@ h1, h2, h3, h4, h5, h6 {
   color: #ef4444;
   font-size: 0.875rem;
 }
+
+/* ============================
+   Summernote Editor Fixes
+   (Fix Bootstrap CSS conflicts)
+   ============================ */
+
+/* Remove duplicate dropdown arrows from Bootstrap */
+.note-btn.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Ensure fullscreen editor sits above all other elements */
+.note-editor.note-fullscreen {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+/* Fix modal z-index and flickering issues */
+.note-modal-backdrop {
+  z-index: 1050 !important;
+  position: fixed !important;
+}
+
+.note-modal {
+  z-index: 1060 !important;
+  position: fixed !important;
+}
+
+/* Prevent modal content from causing layout shifts */
+.note-modal .modal-dialog {
+  margin: 30px auto;
+}
+
+/* Stabilize popover/tooltip positioning */
+.note-popover.popover {
+  z-index: 1070 !important;
+}
+
+/* Fix dropdown menu z-index */
+.note-editor .dropdown-menu {
+  z-index: 1080 !important;
+}
