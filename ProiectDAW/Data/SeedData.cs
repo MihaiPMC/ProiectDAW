@@ -25,7 +25,7 @@ public static class SeedData
         }
 
         // Admin User
-        var adminEmail = "mihaipatru05@gmail.com";
+        var adminEmail = "admin@test.com";
         var adminPwd = "Admin123!"; 
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);

@@ -1,5 +1,5 @@
 
-/* Voting System */
+
 .vote-btn {
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     color: var(--text-muted);
@@ -12,20 +12,20 @@
 }
 
 .vote-btn.upvote:hover {
-    color: #f97316; /* Orange 500 */
+    color: #f97316;
 }
 
 .vote-btn.downvote:hover {
-    color: #3b82f6; /* Blue 500 */
+    color: #3b82f6;
 }
 
 .active-up {
-    color: #f97316 !important; /* Orange 500 */
+    color: #f97316 !important;
     transform: scale(1.1);
 }
 
 .active-down {
-    color: #3b82f6 !important; /* Blue 500 */
+    color: #3b82f6 !important;
     transform: scale(1.1);
 }
 

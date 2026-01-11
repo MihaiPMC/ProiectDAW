@@ -27,7 +27,7 @@ namespace ProiectDAW.Models
         public virtual ICollection<Group> OwnedGroups { get; set; } = new List<Group>();
         
         // Relationships for Follows
-        // Usually handled via InverseProperty in DbContext or here if distinct
+
         public virtual ICollection<Follow> Followers { get; set; } = new List<Follow>();
         public virtual ICollection<Follow> Followings { get; set; } = new List<Follow>();
 

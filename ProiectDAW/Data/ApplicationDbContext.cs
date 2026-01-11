@@ -25,7 +25,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        // Configure Follow relationship
+
         builder.Entity<Follow>()
             .HasOne(f => f.Follower)
             .WithMany(u => u.Followings)
@@ -38,42 +38,42 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(f => f.EditorId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Configure GroupMember relationship
+
         builder.Entity<GroupMember>()
             .HasOne(gm => gm.User)
             .WithMany(u => u.GroupMemberships)
             .HasForeignKey(gm => gm.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // NewsArticle -> Editor relationship (optional specific config, restricting to be safe/explicit)
+
         builder.Entity<NewsArticle>()
             .HasOne(na => na.Editor)
             .WithMany(u => u.NewsArticles)
             .HasForeignKey(na => na.EditorId)
             .OnDelete(DeleteBehavior.Restrict);
             
-        // Comment -> User relationship
+
         builder.Entity<Comment>()
             .HasOne(c => c.User)
             .WithMany(u => u.Comments)
             .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent cascade if user deleted ? Or Cascade. Let's stick to Restrict generally to avoid multiple paths.
+            .OnDelete(DeleteBehavior.Restrict);
             
-        // Group -> Owner relationship
+
          builder.Entity<Group>()
             .HasOne(g => g.Owner)
             .WithMany(u => u.OwnedGroups)
             .HasForeignKey(g => g.OwnerId)
             .OnDelete(DeleteBehavior.Restrict);
             
-        // GroupMessage -> Sender relationship
+
         builder.Entity<GroupMessage>()
             .HasOne(gm => gm.Sender)
             .WithMany(u => u.SentGroupMessages)
             .HasForeignKey(gm => gm.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Vote Configurations
+
         builder.Entity<ArticleVote>()
             .HasOne(v => v.User)
             .WithMany()
@@ -84,7 +84,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(v => v.NewsArticle)
             .WithMany()
             .HasForeignKey(v => v.NewsArticleId)
-            .OnDelete(DeleteBehavior.Cascade); // If article is deleted, votes go too
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<CommentVote>()
             .HasOne(v => v.User)
@@ -96,6 +96,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(v => v.Comment)
             .WithMany()
             .HasForeignKey(v => v.CommentId)
-            .OnDelete(DeleteBehavior.Cascade); // If comment is deleted, votes go too
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

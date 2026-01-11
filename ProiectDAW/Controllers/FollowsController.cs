@@ -33,14 +33,13 @@ namespace ProiectDAW.Controllers
             var targetUser = await _userManager.FindByIdAsync(userId);
             if (targetUser == null) return NotFound();
 
-            // Check if request already exists
+
             var existingFollow = await _context.Follows
                 .FirstOrDefaultAsync(f => f.FollowerId == currentUser.Id && f.EditorId == userId);
 
             if (existingFollow != null)
             {
-                // If it was rejected, maybe allow re-request? For now, just say already requested.
-                // Or if we want to toggle, Unfollow. But this is SendRequest.
+
                 if (existingFollow.Status == FollowStatus.Blocked)
                 {
                     return BadRequest("You are blocked from following this user.");
@@ -104,7 +103,7 @@ namespace ProiectDAW.Controllers
             var follow = await _context.Follows.FindAsync(requestId);
             if (follow == null || follow.EditorId != currentUser.Id) return Unauthorized();
 
-            _context.Follows.Remove(follow); // Or set to Rejected if we want to keep history
+            _context.Follows.Remove(follow);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("MyFollowers");
@@ -181,10 +180,7 @@ namespace ProiectDAW.Controllers
             }
             else 
             {
-                // If checking only "followers you have", we might skip this. 
-                // But to be robust, we can block someone even if they don't follow us yet?
-                // The UI will likely only show this button on existing followers.
-                // But if needed we can create a new Blocked record.
+
                 var newBlock = new Follow 
                 {
                     EditorId = currentUser.Id,
@@ -210,7 +206,7 @@ namespace ProiectDAW.Controllers
 
             if (follow != null)
             {
-                _context.Follows.Remove(follow); // Removing block means they are no longer following/blocked. Status resets to nothing.
+                _context.Follows.Remove(follow);
                 await _context.SaveChangesAsync();
             }
 

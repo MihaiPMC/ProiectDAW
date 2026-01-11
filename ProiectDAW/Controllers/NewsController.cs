@@ -41,7 +41,7 @@ namespace ProiectDAW.Controllers
                 ViewData["UserArticleVotes"] = userVotes;
             }
 
-            // Load total scores (could be optimized with a GroupBy query or a computed column, but separate query for now)
+
             var articleScores = await _context.ArticleVotes
                 .GroupBy(v => v.NewsArticleId)
                 .Select(g => new { ArticleId = g.Key, Score = g.Sum(v => v.Value) })
@@ -60,8 +60,7 @@ namespace ProiectDAW.Controllers
             var article = await _context.NewsArticles
                 .Include(n => n.Editor)
                 .Include(n => n.Comments).ThenInclude(c => c.User)
-                // We load all comments. EF Core fix-up will populate Parent/Replies relationships automatically 
-                // because all entities are in the context.
+
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (article == null) return NotFound();
@@ -113,7 +112,7 @@ namespace ProiectDAW.Controllers
         [Authorize(Roles = "Editor,Administrator")]
         public async Task<IActionResult> Create(NewsArticle article, IFormFile? coverImage)
         {
-            // Remove navigation properties from validation
+
             ModelState.Remove(nameof(article.Editor));
             ModelState.Remove(nameof(article.EditorId));
             ModelState.Remove(nameof(article.Comments));
@@ -164,7 +163,7 @@ namespace ProiectDAW.Controllers
             if (article == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
-            // Check if user is Admin or the Owner
+
             if (!User.IsInRole("Administrator") && article.EditorId != user.Id)
             {
                 return Forbid();
@@ -345,22 +344,17 @@ namespace ProiectDAW.Controllers
 
             var articleId = comment.NewsArticleId;
 
-            // Soft Delete Logic:
-            // If the comment has replies, we must not remove it from DB or the tree will break.
-            // Instead, we mark it as deleted and clear its content effectively.
+
             if (_context.Comments.Any(c => c.ParentCommentId == id))
             {
                 comment.IsDeleted = true;
                 comment.Content = "[deleted]"; // Or keep it and filter in view, but clearing it is safer/cleaner.
-                // We keep the User association or set to null? 
-                // Setting generic content covers privacy. 
-                // We can't easily nullify UserId if it's required string, unless we allow nullable or assign a system user.
-                // For now, IsDeleted flag will handle the UI display.
+
                 _context.Update(comment);
             }
             else
             {
-                // Leaf node - safe to hard delete
+
                 _context.Comments.Remove(comment);
             }
             
@@ -381,7 +375,7 @@ namespace ProiectDAW.Controllers
 
             if (existingVote != null)
             {
-                // If clicking the same vote again, remove it (toggle off)
+
                 if (existingVote.Value == voteValue)
                 {
                     _context.ArticleVotes.Remove(existingVote);
@@ -396,7 +390,7 @@ namespace ProiectDAW.Controllers
             else
             {
                 // New vote
-                // Only create if voteValue is not 0 (though UI shouldn't send 0)
+
                 if (voteValue != 0)
                 {
                     var vote = new ArticleVote

@@ -219,10 +219,10 @@ namespace ProiectDAW.Controllers
                 return NotFound();
             }
 
-            // Check if owner is leaving
+
             if (group.OwnerId == currentUser.Id)
             {
-                // Find oldest accepted member to be successor
+
                 var successor = group.Members
                     .Where(m => m.IsAccepted && m.UserId != currentUser.Id && !m.IsBanned)
                     .OrderBy(m => m.JoinedDate)
@@ -230,21 +230,21 @@ namespace ProiectDAW.Controllers
 
                 if (successor != null)
                 {
-                    // Transfer ownership
+
                     group.OwnerId = successor.UserId;
                     TempData["SuccessMessage"] = "You left the group. The moderator role was automatically transferred.";
                 }
                 else
                 {
-                    // No successor found (group is empty or only has pending/banned members), delete group
-                    // Delete all messages first
+
+
                     var messages = await _context.GroupMessages.Where(m => m.GroupId == id).ToListAsync();
                     _context.GroupMessages.RemoveRange(messages);
                     
-                    // Remove all members
+
                     _context.GroupMembers.RemoveRange(group.Members);
                     
-                    // Remove group
+
                     _context.Groups.Remove(group);
                     
                     await _context.SaveChangesAsync();
@@ -507,7 +507,7 @@ namespace ProiectDAW.Controllers
                 return Forbid();
             }
 
-            // Șterge toate mesajele și membrii
+
             _context.GroupMessages.RemoveRange(group.Messages);
             _context.GroupMembers.RemoveRange(group.Members);
             _context.Groups.Remove(group);
@@ -518,7 +518,7 @@ namespace ProiectDAW.Controllers
         }
     }
 
-    // ViewModels
+
     public class GroupIndexViewModel
     {
         public List<GroupViewModel> Groups { get; set; } = new List<GroupViewModel>();

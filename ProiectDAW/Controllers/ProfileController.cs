@@ -33,7 +33,7 @@ namespace ProiectDAW.Controllers
                 SearchTerm = searchTerm
             };
 
-            // Initial load empty or with search term if provided
+
             return View(model);
         }
 
@@ -46,11 +46,10 @@ namespace ProiectDAW.Controllers
                 return PartialView("_EditorListPartial", new List<EditorProfileViewModel>());
             }
 
-            // Case-insensitive search using ToLower() for safety, though SQL might handle it.
-            // Using logic: if names parts contain the search term.
+
             searchTerm = searchTerm.ToLower();
             
-            // Get IDs of users who have blocked the current user
+
             var blockedByids = new List<string>();
             if (User.Identity.IsAuthenticated)
             {
@@ -62,27 +61,25 @@ namespace ProiectDAW.Controllers
             }
 
             var editors = await _userManager.Users
-                .ToListAsync(); // Pull users first to filter client-side for roles if needed, or query efficiently.
-                                // NOTE: complex queries with roles are tricky in LINQ to Entities directly if roles are separate tables.
-                                // Optimisation: Filter in memory for small datasets, or Join for large.
+                .ToListAsync();
                                 
             var filteredEditors = new List<EditorProfileViewModel>();
             
             foreach (var user in editors)
             {
-                // Skip if blocked
+
                 if (blockedByids.Contains(user.Id))
                 {
                     continue;
                 }
 
-                // Check name match first
+
                 string fullName = (user.FirstName + " " + user.LastName).ToLower();
                 if (user.FirstName.ToLower().Contains(searchTerm) || 
                     user.LastName.ToLower().Contains(searchTerm) || 
                     fullName.Contains(searchTerm))
                 {
-                    // Then Check Role
+
                     if (await _userManager.IsInRoleAsync(user, "Editor") || await _userManager.IsInRoleAsync(user, "Administrator"))
                     {
                         filteredEditors.Add(new EditorProfileViewModel
@@ -116,11 +113,11 @@ namespace ProiectDAW.Controllers
                 return NotFound();
             }
 
-            // Verify if user is Editor or Administrator
+
             var roles = await _userManager.GetRolesAsync(user);
             var isEditor = roles.Contains("Editor") || roles.Contains("Administrator");
 
-            // Check Follow Status if user is logged in
+
             FollowStatus? followStatus = null;
             bool isFollowing = false;
             
@@ -140,7 +137,6 @@ namespace ProiectDAW.Controllers
                 }
                 else
                 {
-                    // Viewing own profile, treat as "following" for visibility purposes or handle separately
                     isFollowing = true; 
                 }
             }
@@ -159,13 +155,9 @@ namespace ProiectDAW.Controllers
                 IsFollowing = isFollowing
             };
 
-            // Logic for what to show
-            // Show full profile if:
-            // 1. Profile is Public
-            // 2. OR Profile is Private BUT (User is Following (Approved) OR User is Self)
             bool showFullProfile = !user.IsProfilePrivate || (user.IsProfilePrivate && isFollowing);
             
-            // Note: isFollowing is true if it's my own profile (set above: currentUserId == user.Id)
+
             
             if (!showFullProfile)
             {
@@ -173,10 +165,9 @@ namespace ProiectDAW.Controllers
             }
             else
             {
-                // Profile is public OR we are friends/self - show all info
                 model.IsLimitedView = false;
                 
-                // Add additional statistics
+
                 model.ArticlesCount = await _context.NewsArticles
                     .Where(a => a.EditorId == user.Id)
                     .CountAsync();
@@ -228,7 +219,7 @@ namespace ProiectDAW.Controllers
                 return NotFound();
             }
 
-            // Validare custom: imaginea este obligatorie doar dacă nu există deja una -> Custom validation: profile picture is required only if one doesn't already exist
+
             if (model.ProfilePicture == null && string.IsNullOrEmpty(user.ProfilePicturePath))
             {
                 ModelState.AddModelError("ProfilePicture", "Profile picture is required");
@@ -246,10 +237,10 @@ namespace ProiectDAW.Controllers
             user.Description = model.Description;
             user.IsProfilePrivate = model.IsProfilePrivate;
 
-            // Process profile picture if uploaded
+
             if (model.ProfilePicture != null)
             {
-                // Delete old image if exists
+
                 if (!string.IsNullOrEmpty(user.ProfilePicturePath))
                 {
                     var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePicturePath.TrimStart('/'));
@@ -259,7 +250,7 @@ namespace ProiectDAW.Controllers
                     }
                 }
 
-                // Save new image
+
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -304,7 +295,7 @@ namespace ProiectDAW.Controllers
         }
     }
 
-    // ViewModels
+
     public class EditorSearchViewModel
     {
         public string? SearchTerm { get; set; }
@@ -333,12 +324,12 @@ namespace ProiectDAW.Controllers
         public bool IsLimitedView { get; set; }
         public DateTime CreatedAt { get; set; }
         
-        // Additional information for public profile
+
         public int ArticlesCount { get; set; }
         public int FollowersCount { get; set; }
         public List<NewsArticle> Articles { get; set; } = new List<NewsArticle>();
         
-        // Follow Status relative to current logged in user
+
         public FollowStatus? CurrentUserFollowStatus { get; set; }
         public bool IsFollowing { get; set; }
     }

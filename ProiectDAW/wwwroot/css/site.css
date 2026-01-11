@@ -1,12 +1,12 @@
 :root {
-  --primary-color: #4f46e5; /* Indigo 600 */
-  --primary-hover: #4338ca; /* Indigo 700 */
-  --secondary-color: #ec4899; /* Pink 500 */
-  --accent-color: #8b5cf6; /* Violet 500 */
-  --background-color: #f8fafc; /* Slate 50 */
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary-color: #ec4899;
+  --accent-color: #8b5cf6;
+  --background-color: #f8fafc;
   --surface-color: #ffffff;
-  --text-main: #0f172a; /* Slate 900 */
-  --text-muted: #64748b; /* Slate 500 */
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   --border-radius: 16px;
   --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --glass-bg: rgba(255, 255, 255, 0.7);
@@ -153,23 +153,16 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875rem;
 }
 
-/* ============================
-   Summernote Editor Fixes
-   (Fix Bootstrap CSS conflicts)
-   ============================ */
 
-/* Remove duplicate dropdown arrows from Bootstrap */
 .note-btn.dropdown-toggle::after {
   display: none !important;
 }
 
-/* Ensure fullscreen editor sits above all other elements */
 .note-editor.note-fullscreen {
   z-index: 9999 !important;
   position: fixed !important;
 }
 
-/* Fix modal z-index and flickering issues */
 .note-modal-backdrop {
   z-index: 1050 !important;
   position: fixed !important;
@@ -180,17 +173,14 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed !important;
 }
 
-/* Prevent modal content from causing layout shifts */
 .note-modal .modal-dialog {
   margin: 30px auto;
 }
 
-/* Stabilize popover/tooltip positioning */
 .note-popover.popover {
   z-index: 1070 !important;
 }
 
-/* Fix dropdown menu z-index */
 .note-editor .dropdown-menu {
   z-index: 1080 !important;
 }
