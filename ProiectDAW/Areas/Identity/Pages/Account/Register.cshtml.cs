@@ -91,6 +91,7 @@ namespace ProiectDAW.Areas.Identity.Pages.Account
 
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
+                user.EmailConfirmed = true;
 
                 var userName = $"{Input.FirstName}{Input.LastName}";
                 await _userStore.SetUserNameAsync(user, userName, CancellationToken.None);
