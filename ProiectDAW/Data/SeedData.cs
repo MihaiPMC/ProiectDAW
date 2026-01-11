@@ -33,11 +33,11 @@ public static class SeedData
         {
             adminUser = new ApplicationUser
             {
-                UserName = "MihaiPatru",
+                UserName = "TestAdmin",
                 Email = adminEmail,
                 EmailConfirmed = true,
-                FirstName = "Mihai",
-                LastName = "Patru"
+                FirstName = "Admin",
+                LastName = "User"
             };
             var createPowerUser = await userManager.CreateAsync(adminUser, adminPwd);
             if (createPowerUser.Succeeded)
