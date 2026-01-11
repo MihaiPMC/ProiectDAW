@@ -10,18 +10,18 @@ namespace ProiectDAW.Models
 
         [Required]
         [StringLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         // Foreign keys
-        public string OwnerId { get; set; }
+        public string OwnerId { get; set; } = string.Empty;
 
         // Navigation properties
         [ForeignKey("OwnerId")]
-        public virtual ApplicationUser Owner { get; set; }
+        public virtual ApplicationUser? Owner { get; set; }
 
         public virtual ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
         public virtual ICollection<GroupMessage> Messages { get; set; } = new List<GroupMessage>();
@@ -38,14 +38,14 @@ namespace ProiectDAW.Models
 
         // Foreign keys
         public int GroupId { get; set; }
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         // Navigation properties
         [ForeignKey("GroupId")]
-        public virtual Group Group { get; set; }
+        public virtual Group? Group { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
     }
 
     public class GroupMessage
@@ -54,20 +54,20 @@ namespace ProiectDAW.Models
         public int Id { get; set; }
 
         [Required]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
 
         // Foreign keys
         public int GroupId { get; set; }
-        public string SenderId { get; set; }
+        public string SenderId { get; set; } = string.Empty;
 
         // Navigation properties
         [ForeignKey("GroupId")]
-        public virtual Group Group { get; set; }
+        public virtual Group? Group { get; set; }
 
         [ForeignKey("SenderId")]
-        public virtual ApplicationUser Sender { get; set; }
+        public virtual ApplicationUser? Sender { get; set; }
     }
 }

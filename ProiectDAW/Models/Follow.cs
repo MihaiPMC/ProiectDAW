@@ -21,14 +21,14 @@ namespace ProiectDAW.Models
         public DateTime RequestDate { get; set; }
 
         // Foreign keys
-        public string FollowerId { get; set; }
-        public string EditorId { get; set; }
+        public string FollowerId { get; set; } = string.Empty;
+        public string EditorId { get; set; } = string.Empty;
 
         // Navigation properties
         [ForeignKey("FollowerId")]
-        public virtual ApplicationUser Follower { get; set; }
+        public virtual ApplicationUser? Follower { get; set; }
 
         [ForeignKey("EditorId")]
-        public virtual ApplicationUser Editor { get; set; }
+        public virtual ApplicationUser? Editor { get; set; }
     }
 }

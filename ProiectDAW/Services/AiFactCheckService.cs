@@ -10,7 +10,7 @@ namespace ProiectDAW.Services
 
     public class AiFactCheckService : IAiFactCheckService
     {
-        private readonly string _apiKey;
+        private readonly string? _apiKey;
         private readonly HttpClient _httpClient;
 
         public AiFactCheckService(IConfiguration configuration)
@@ -66,8 +66,10 @@ Target JSON format:
                 response.EnsureSuccessStatusCode();
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                dynamic result = JsonConvert.DeserializeObject(responseString);
-                var contentResponse = result.choices[0].message.content.ToString();
+                dynamic? result = JsonConvert.DeserializeObject(responseString);
+                string? contentResponse = result?.choices?[0]?.message?.content?.ToString();
+                
+                if (string.IsNullOrEmpty(contentResponse)) return (0, "Error", "Empty response from AI");
 
                 // Clean contentResponse if it contains markdown code blocks
                 contentResponse = contentResponse.Replace("```json", "").Replace("```", "").Trim();

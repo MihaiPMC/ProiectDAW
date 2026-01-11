@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
 @functions {
-    private object _signInManager;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +36,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="News" asp-action="Index">Global</a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Following">Following</a>

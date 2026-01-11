@@ -10,10 +10,10 @@ namespace ProiectDAW.Models
 
         [Required]
         [StringLength(200)]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         public string? CoverImagePath { get; set; }
 
@@ -25,11 +25,11 @@ namespace ProiectDAW.Models
         public string? AiJustification { get; set; }
 
         // Foreign keys
-        public string EditorId { get; set; }
+        public string EditorId { get; set; } = string.Empty;
 
         // Navigation properties
         [ForeignKey("EditorId")]
-        public virtual ApplicationUser Editor { get; set; }
+        public virtual ApplicationUser? Editor { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
@@ -43,7 +43,7 @@ namespace ProiectDAW.Models
 
         [Required]
         [StringLength(1000)]
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         public DateTime PostedDate { get; set; } = DateTime.Now;
 
@@ -53,18 +53,18 @@ namespace ProiectDAW.Models
 
         // Foreign keys
         public int NewsArticleId { get; set; }
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         public int? ParentCommentId { get; set; }
 
         // Navigation properties
         [ForeignKey("NewsArticleId")]
-        public virtual NewsArticle NewsArticle { get; set; }
+        public virtual NewsArticle? NewsArticle { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
 
         [ForeignKey("ParentCommentId")]
-        public virtual Comment ParentComment { get; set; }
+        public virtual Comment? ParentComment { get; set; }
 
         public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
     }

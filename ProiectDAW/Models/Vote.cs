@@ -10,7 +10,7 @@ namespace ProiectDAW.Models
 
         public int NewsArticleId { get; set; }
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         // 1 for Upvote, -1 for Downvote
         [Range(-1, 1)]
@@ -18,10 +18,10 @@ namespace ProiectDAW.Models
 
         // Navigation
         [ForeignKey("NewsArticleId")]
-        public virtual NewsArticle NewsArticle { get; set; }
+        public virtual NewsArticle? NewsArticle { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
     }
 
     public class CommentVote
@@ -31,7 +31,7 @@ namespace ProiectDAW.Models
 
         public int CommentId { get; set; }
 
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         // 1 for Upvote, -1 for Downvote
         [Range(-1, 1)]
@@ -39,9 +39,9 @@ namespace ProiectDAW.Models
 
         // Navigation
         [ForeignKey("CommentId")]
-        public virtual Comment Comment { get; set; }
+        public virtual Comment? Comment { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
     }
 }

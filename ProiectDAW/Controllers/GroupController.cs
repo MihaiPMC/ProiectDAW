@@ -24,6 +24,7 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var groups = await _context.Groups
                 .Include(g => g.Owner)
                 .Include(g => g.Members)
@@ -38,7 +39,7 @@ namespace ProiectDAW.Controllers
                     Name = g.Name,
                     Description = g.Description,
                     CreatedDate = g.CreatedDate,
-                    OwnerName = g.Owner.FirstName + " " + g.Owner.LastName,
+                    OwnerName = (g.Owner?.FirstName ?? "Unknown") + " " + (g.Owner?.LastName ?? "User"),
                     OwnerId = g.OwnerId,
                     MembersCount = g.Members.Count(m => m.IsAccepted),
                     IsMember = g.Members.Any(m => m.UserId == currentUser.Id && m.IsAccepted),
@@ -69,6 +70,7 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
 
             var group = new Group
             {
@@ -99,6 +101,7 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var group = await _context.Groups
                 .Include(g => g.Owner)
                 .Include(g => g.Members.Where(m => m.IsAccepted))
@@ -125,7 +128,7 @@ namespace ProiectDAW.Controllers
                 Name = group.Name,
                 Description = group.Description,
                 CreatedDate = group.CreatedDate,
-                OwnerName = group.Owner.FirstName + " " + group.Owner.LastName,
+                OwnerName = (group.Owner?.FirstName ?? "Unknown") + " " + (group.Owner?.LastName ?? "User"),
                 OwnerId = group.OwnerId,
                 IsOwner = isOwner,
                 IsMember = isMember,
@@ -133,7 +136,7 @@ namespace ProiectDAW.Controllers
                 Members = group.Members.Select(m => new GroupMemberViewModel
                 {
                     UserId = m.UserId,
-                    UserName = m.User.FirstName + " " + m.User.LastName,
+                    UserName = (m.User?.FirstName ?? "Unknown") + " " + (m.User?.LastName ?? "User"),
                     JoinedDate = m.JoinedDate
                 }).ToList(),
                 Messages = isMember || isOwner 
@@ -143,7 +146,7 @@ namespace ProiectDAW.Controllers
                         Content = m.Content,
                         Timestamp = m.Timestamp,
                         UpdatedAt = m.UpdatedAt,
-                        SenderName = m.Sender.FirstName + " " + m.Sender.LastName,
+                        SenderName = (m.Sender?.FirstName ?? "Unknown") + " " + (m.Sender?.LastName ?? "User"),
                         SenderId = m.SenderId,
                         IsOwnMessage = m.SenderId == currentUser.Id
                     }).ToList()
@@ -159,6 +162,7 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> Join(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var group = await _context.Groups.FindAsync(id);
 
             if (group == null)
@@ -202,6 +206,7 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> Leave(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var group = await _context.Groups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.Id == id);
@@ -268,6 +273,7 @@ namespace ProiectDAW.Controllers
         public async Task<IActionResult> ManageMembers(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var group = await _context.Groups
                 .Include(g => g.Members)
                     .ThenInclude(m => m.User)
@@ -291,14 +297,14 @@ namespace ProiectDAW.Controllers
                 {
                     MembershipId = m.Id,
                     UserId = m.UserId,
-                    UserName = m.User.FirstName + " " + m.User.LastName,
+                    UserName = (m.User?.FirstName ?? "Unknown") + " " + (m.User?.LastName ?? "User"),
                     RequestDate = m.JoinedDate
                 }).ToList(),
                 AcceptedMembers = group.Members.Where(m => m.IsAccepted).Select(m => new MemberRequestViewModel
                 {
                     MembershipId = m.Id,
                     UserId = m.UserId,
-                    UserName = m.User.FirstName + " " + m.User.LastName,
+                    UserName = (m.User?.FirstName ?? "Unknown") + " " + (m.User?.LastName ?? "User"),
                     RequestDate = m.JoinedDate
                 }).ToList()
             };
@@ -321,7 +327,8 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
-            if (membership.Group.OwnerId != currentUser.Id)
+            if (currentUser == null) return NotFound();
+            if (membership.Group?.OwnerId != currentUser.Id)
             {
                 return Forbid();
             }
@@ -348,7 +355,8 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
-            if (membership.Group.OwnerId != currentUser.Id)
+            if (currentUser == null) return NotFound();
+            if (membership.Group?.OwnerId != currentUser.Id)
             {
                 return Forbid();
             }
@@ -407,6 +415,7 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             var membership = await _context.GroupMembers
                 .FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == currentUser.Id && m.IsAccepted);
 
@@ -449,6 +458,7 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             if (message.SenderId != currentUser.Id)
             {
                 return Forbid();
@@ -473,6 +483,7 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             if (message.SenderId != currentUser.Id)
             {
                 return Forbid();
@@ -502,6 +513,7 @@ namespace ProiectDAW.Controllers
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return NotFound();
             if (group.OwnerId != currentUser.Id)
             {
                 return Forbid();

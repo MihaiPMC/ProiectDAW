@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <label asp-for="Description" class="form-label">Description</label>
                             <textarea asp-for="Description" class="form-control" rows="4" 
                                       placeholder="Write a few words about yourself..."></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
@@ -37,10 +37,6 @@
                         <div class="mb-3">
                             <label asp-for="ProfilePicture" class="form-label">
                                 Profile Picture
-                                @if (string.IsNullOrEmpty(Model.CurrentProfilePicturePath))
-                                {
-                                    <span class="text-danger">*</span>
-                                }
                             </label>
                             
                             @if (!string.IsNullOrEmpty(Model.CurrentProfilePicturePath))

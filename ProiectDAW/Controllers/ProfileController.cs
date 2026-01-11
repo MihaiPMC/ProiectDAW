@@ -220,10 +220,7 @@ namespace ProiectDAW.Controllers
             }
 
 
-            if (model.ProfilePicture == null && string.IsNullOrEmpty(user.ProfilePicturePath))
-            {
-                ModelState.AddModelError("ProfilePicture", "Profile picture is required");
-            }
+
 
             if (!ModelState.IsValid)
             {
@@ -304,9 +301,9 @@ namespace ProiectDAW.Controllers
 
     public class EditorProfileViewModel
     {
-        public string UserId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? ProfilePicturePath { get; set; }
         public bool IsProfilePrivate { get; set; }
@@ -314,9 +311,9 @@ namespace ProiectDAW.Controllers
 
     public class ViewProfileViewModel
     {
-        public string UserId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? ProfilePicturePath { get; set; }
         public bool IsProfilePrivate { get; set; }
@@ -338,15 +335,14 @@ namespace ProiectDAW.Controllers
     {
         [Required(ErrorMessage = "First Name is required")]
         [StringLength(100, ErrorMessage = "First Name cannot exceed 100 characters")]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Last Name is required")]
         [StringLength(100, ErrorMessage = "Last Name cannot exceed 100 characters")]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Description is required")]
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public IFormFile? ProfilePicture { get; set; }
 

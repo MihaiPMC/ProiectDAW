@@ -16,7 +16,7 @@
     <div class="mb-4 text-center position-relative">
         <h1 class="display-4 fw-bold">@Model.Title</h1>
         <p class="text-muted">
-            Published by <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none"><strong>@Model.Editor.FirstName @Model.Editor.LastName</strong></a> 
+            Published by <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none"><strong>@(Model.Editor?.FirstName ?? "Unknown") @(Model.Editor?.LastName ?? "User")</strong></a> 
             on @Model.CreatedDate.ToString("f")
             @if(Model.IsEdited)
             {

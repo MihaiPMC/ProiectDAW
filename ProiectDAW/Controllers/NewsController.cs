@@ -32,7 +32,7 @@ namespace ProiectDAW.Controllers
                 .OrderByDescending(n => n.CreatedDate)
                 .ToListAsync();
 
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var userId = _userManager.GetUserId(User);
                 var userVotes = await _context.ArticleVotes
@@ -67,7 +67,7 @@ namespace ProiectDAW.Controllers
 
             if (article == null) return NotFound();
 
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var userId = _userManager.GetUserId(User);
                 
@@ -120,6 +120,7 @@ namespace ProiectDAW.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
+                if (user == null) return NotFound();
                 article.EditorId = user.Id;
                 article.CreatedDate = DateTime.Now;
 
@@ -163,6 +164,7 @@ namespace ProiectDAW.Controllers
             if (article == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
 
             if (!User.IsInRole("Administrator") && article.EditorId != user.Id)
             {
@@ -184,6 +186,7 @@ namespace ProiectDAW.Controllers
             if (existingArticle == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             if (!User.IsInRole("Administrator") && existingArticle.EditorId != user.Id)
             {
                 return Forbid();
@@ -241,6 +244,7 @@ namespace ProiectDAW.Controllers
             if (article == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             if (!User.IsInRole("Administrator") && article.EditorId != user.Id)
             {
                 return Forbid();
@@ -260,6 +264,7 @@ namespace ProiectDAW.Controllers
             if (string.IsNullOrWhiteSpace(content)) return RedirectToAction(nameof(Details), new { id = articleId });
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             var comment = new Comment
             {
                 NewsArticleId = articleId,
@@ -285,6 +290,7 @@ namespace ProiectDAW.Controllers
             if (comment == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             if (!User.IsInRole("Administrator") && comment.UserId != user.Id)
             {
                 return Forbid();
@@ -303,6 +309,7 @@ namespace ProiectDAW.Controllers
             if (comment == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             if (!User.IsInRole("Administrator") && comment.UserId != user.Id)
             {
                 return Forbid();
@@ -332,10 +339,11 @@ namespace ProiectDAW.Controllers
             if (comment == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             // Allow if Admin OR Comment Owner OR Article Editor
             bool isAllowed = User.IsInRole("Administrator") 
                              || comment.UserId == user.Id
-                             || comment.NewsArticle.EditorId == user.Id;
+                             || comment.NewsArticle?.EditorId == user.Id;
 
             if (!isAllowed)
             {
@@ -370,6 +378,7 @@ namespace ProiectDAW.Controllers
             if (voteValue < -1 || voteValue > 1) return BadRequest("Invalid vote value.");
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             var existingVote = await _context.ArticleVotes
                 .FirstOrDefaultAsync(v => v.NewsArticleId == articleId && v.UserId == user.Id);
 
@@ -422,6 +431,7 @@ namespace ProiectDAW.Controllers
             if (voteValue < -1 || voteValue > 1) return BadRequest("Invalid vote value.");
 
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
             var existingVote = await _context.CommentVotes
                 .FirstOrDefaultAsync(v => v.CommentId == commentId && v.UserId == user.Id);
 
