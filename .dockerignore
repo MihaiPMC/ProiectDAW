@@ -1,0 +1,11 @@
+**/.dockerignore
+**/.env
+**/bin/
+**/obj/
+**/out/
+**/.git/
+**/.vs/
+**/.idea/
+**/app.db
+**/app.db-shm
+**/app.db-wal

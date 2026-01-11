@@ -1,0 +1,19 @@
+services:
+  webapp:
+    image: proiectdaw
+    build:
+      context: .
+      dockerfile: ProiectDAW/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=DataSource=data/app.db;Cache=Shared
+      # Add other environment variables here if needed
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./app_data:/app/data
+      # Mount the .env file if you want to use it inside the container, 
+      # though passing environment variables strictly via compose is often preferred in prod.
+      # - ./ProiectDAW/.env:/app/.env 
+    restart: unless-stopped
