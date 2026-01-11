@@ -43,6 +43,20 @@ public class HomeController : Controller
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
 
+        // Fetch user votes
+        var userId = _userManager.GetUserId(User);
+        var userVotes = await _context.ArticleVotes
+            .Where(v => v.UserId == userId)
+            .ToDictionaryAsync(v => v.NewsArticleId, v => v.Value);
+        ViewData["UserArticleVotes"] = userVotes;
+
+        // Fetch article scores
+        var articleScores = await _context.ArticleVotes
+            .GroupBy(v => v.NewsArticleId)
+            .Select(g => new { ArticleId = g.Key, Score = g.Sum(v => v.Value) })
+            .ToDictionaryAsync(x => x.ArticleId, x => x.Score);
+        ViewData["ArticleScores"] = articleScores;
+
         return View(friendsArticles);
     }
 

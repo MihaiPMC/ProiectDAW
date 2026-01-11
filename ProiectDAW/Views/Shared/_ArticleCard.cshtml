@@ -1,7 +1,19 @@
 @model ProiectDAW.Models.NewsArticle
 
 <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card h-100 shadow-sm">
+    <div class="card h-100 shadow-sm card-hover">
+        <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none text-dark">
+            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+            {
+                <img src="@Model.CoverImagePath" class="card-img-top" alt="Cover Image" style="height: 200px; object-fit: cover;">
+            }
+            else
+            {
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <span class="text-white">No Image</span>
+                </div>
+            }
+        </a>
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
                 <a asp-controller="Profile" asp-action="ViewProfile" asp-route-id="@Model.EditorId" class="text-decoration-none text-dark d-flex align-items-center">
